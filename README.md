@@ -3,7 +3,7 @@
 ## Cosas para hacer
 
 ---
-**Fecha de entrega:** ?? de mayo 2018
+**Fecha de entrega:** 22 de mayo 2018
 ---
 
 ## Links de interés

@@ -1,0 +1,15 @@
+HIPOTESIS
+
+Falta archivo de configuración, suponemos no instalado.
+
+No verificamos integridad de los script shell.
+
+En caso de falta de algún directorio en el archivo conf, no se puede reparar (principio de conservación de la información).
+
+Hay dos formas de instalación común y -r.
+
+Reparacion:
+
+1) Falta algún directorio.
+
+2) Falta algún script.
