@@ -1,4 +1,5 @@
 grupo=/Grupo4
+archivofConf=/Grupo4/dirconf/fnoc.conf
 
 Pedir_Nombres_Directorios()
 {
@@ -71,6 +72,16 @@ Crear_Directorios()
 	####y por ultimo, crear fnoc.conf
 }
 
+Verificar_Existencia_Archivo_Configuracion()
+{
+	if [ -f archivofConf ]
+	then
+		echo "Instalado"
+		###Falta verificacion de salud y reparacion
+	else
+		echo "No instalado. Imposible de reparar."
+	fi
+}
 
 
 VERSION=$(perl -e 'print $];')
@@ -78,9 +89,10 @@ VERSION=$(perl -e 'print $];')
 if [ $VERSION \< "5" ]
 then
 	echo "Tiene que tener instalado Perl 5 o más."
-	###abortar
 	exit
 fi
-
-Pedir_Nombres_Directorios ejec mae ext acep rech proc rep logs
-
+case $# in
+	0) Pedir_Nombres_Directorios ejec mae ext acep rech proc rep logs;;
+	1) Verificar_Existencia_Archivo_Configuracion ;;
+	*) echo "No es una linea de comnado valida.";;
+esac
