@@ -1,26 +1,108 @@
 grupo=/Grupo4
+valido=false
 
 Pedir_Nombres_Directorios()
 {
-	echo "Defina el directorio de ejecutables ($grupo/$1):"
-	read dirEjecutables
-	echo "Defina el directorio de archivos maestros ($grupo/$2):"
-	read dirMaestros
-	echo "Defina el directorio de arribo de archivos externos ($grupo/$3):"
-	read dirExternos
-	echo "Defina el directorio de novedades aceptadas ($grupo/$4):"
-	read dirAceptados
-	echo "Defina el directorio de archivos rechazados ($grupo/$5):"
-	read dirRechazados
-	echo "Defina el directorio de archivos procesados ($grupo/$6):"
-	read dirProcesados
-	echo "Defina el directorio de reportes ($grupo/$7):"
-	read dirReportes
-	echo "Defina el directorio de logs de auditoría del sistema ($grupo/$8):"
-	read dirLogs
-	###faltan validaciones
+	directorioVacio="\n"
+	
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de ejecutables ($grupo/$1):"
+		read dirEjecutables
+		Validar_Nombre $dirEjecutables
+	done
+	
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de archivos maestros ($grupo/$2):"
+		read dirMaestros
+		Validar_Nombre $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de arribo de archivos externos ($grupo/$3):"
+		read dirExternos
+		Validar_Nombre $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de novedades aceptadas ($grupo/$4):"
+		read dirAceptados
+		Validar_Nombre $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de archivos rechazados ($grupo/$5):"
+		read dirRechazados
+		Validar_Nombre $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de archivos procesados ($grupo/$6):"
+		read dirProcesados
+		Validar_Nombre $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de reportes ($grupo/$7):"
+		read dirReportes
+		Validar_Nombre $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de logs de auditoría del sistema ($grupo/$8):"
+		read dirLogs
+		Validar_Nombre $dirLogs $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
 
 	Pedir_Confirmacion
+}
+
+####Validar_Nombre recibe varios parametros: primero el directorio actual y despues los anteriormente ingresados
+Validar_Nombre()
+{
+	if [ $1 = "$directorioVacio" ]
+	then
+		valido=false
+	elif [ $1 = "dirconf" ]
+	then
+		valido=false
+	else
+		valido=true
+	fi
+
+	anterior=$directorioVacio
+	let	contador=0
+	for i in $@
+	do
+		let contador=contador+1
+		###que $contador sea > que 1 para que no se compare con si mismo
+		if [ $contador \> "1" -a $1 = $i ]
+		then
+			valido=false
+		else
+			anterior=$i
+		fi
+	done
+
+	if [ $valido = false ]
+	then
+		echo "Nombre de directorio inválido."
+	fi
 }
 
 Pedir_Confirmacion()
@@ -65,6 +147,7 @@ Crear_Directorios()
 	mkdir $HOME/$grupo/$6
 	mkdir $HOME/$grupo/$7
 	mkdir $HOME/$grupo/$8
+	####validar directorios
 	echo "Directorios creados exitosamente"
 
 	####aca tambien hay que copiar archivos
