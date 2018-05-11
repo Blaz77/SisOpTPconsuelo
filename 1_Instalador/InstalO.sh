@@ -1,10 +1,10 @@
 grupo=/Grupo4
 valido=false
-archivofConf=/Grupo4/dirconf/fnoc.conf
+archivofConf=$HOME/Grupo4/dirconf/fnoc.conf
 
 Pedir_Nombres_Directorios()
 {
-	directorioVacio="\n"
+	directorioVacio=""
 	
 	valido=false
 	while [ $valido = false ]
@@ -86,7 +86,7 @@ Validar_Nombre()
 		valido=true
 	fi
 
-	anterior=$directorioVacio
+	####valido que sea diferente a los anteriormente ingresados
 	let	contador=0
 	for i in $@
 	do
@@ -95,10 +95,14 @@ Validar_Nombre()
 		if [ $contador \> "1" -a $1 = $i ]
 		then
 			valido=false
-		else
-			anterior=$i
 		fi
 	done
+
+	####valido que no exista el uno ya creado con ese nombre
+	if [ -e $HOME/$grupo/$1 ]
+	then
+		valido=false
+	fi
 
 	if [ $valido = false ]
 	then
@@ -148,16 +152,50 @@ Crear_Directorios()
 	mkdir $HOME/$grupo/$6
 	mkdir $HOME/$grupo/$7
 	mkdir $HOME/$grupo/$8
-	####validar directorios
 	echo "Directorios creados exitosamente"
 
-	####aca tambien hay que copiar archivos
-	####y por ultimo, crear fnoc.conf
+	Mover_Archivos
+	Crear_Archivo_Configuracion
+}
+
+Mover_Archivos()
+{
+	rutaMaestros="$HOME/Grupo4/$dirMaestros/"
+
+	archivoAMover="$HOME/Grupo4/archivostp/T1.tab"
+	mv $archivoAMover $rutaMaestros
+
+	archivoAMover="$HOME/Grupo4/archivostp/T2.tab"
+	mv $archivoAMover $rutaMaestros
+
+	archivoAMover="$HOME/Grupo4/archivostp/p-s.mae"
+	mv $archivoAMover $rutaMaestros
+
+	archivoAMover="$HOME/Grupo4/archivostp/PPI.mae"
+	mv $archivoAMover $rutaMaestros
+
+	####los otros archivos hay que moverlos tambien????
+}
+
+Crear_Archivo_Configuracion()
+{
+	fecha=$(date +"%d/%m/%y %H:%M:%S")
+
+	####esto agrega una linea a lo ultimo del archivo
+	####si el archivo no existe lo crea
+	echo "ejecutables-$dirEjecutables-$USER-$fecha" >> $archivofConf
+	echo "maestros-$dirMaestros-$USER-$fecha" >> $archivofConf
+	echo "externos-$dirExternos-$USER-$fecha" >> $archivofConf
+	echo "aceptados-$dirAceptados-$USER-$fecha" >> $archivofConf
+	echo "rechazados-$dirRechazados-$USER-$fecha" >> $archivofConf
+	echo "procesados-$dirProcesados-$USER-$fecha" >> $archivofConf
+	echo "reportes-$dirReportes-$USER-$fecha" >> $archivofConf
+	echo "logs-$dirLogs-$USER-$fecha" >> $archivofConf
 }
 
 Verificar_Existencia_Archivo_Configuracion()
 {
-	if [ -f archivofConf ]
+	if [ -f $archivofConf ]
 	then
 		echo "Instalado"
 		###Falta verificacion de salud y reparacion
@@ -175,7 +213,7 @@ then
 	exit
 fi
 case $# in
-	0) Pedir_Nombres_Directorios ejec mae ext acep rech proc rep logs;;
+	0) Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs";;
 	1) Verificar_Existencia_Archivo_Configuracion ;;
 	*) echo "No es una línea de comando válida.";;
 esac

@@ -1,0 +1,4 @@
+Hipotesis:
+
+-Supongo que el directorio Grupo4 se ubica en $HOME
+-Supongo que en Grupo4 tengo una carpeta llamada archivostp que contiene todos los archivos dados por la cátedra
