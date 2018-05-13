@@ -51,7 +51,7 @@ Estado de la instalación: LISTA
 		echo "\nVuelva a ingresar los nombres de los directorios"
 		Pedir_Nombres_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	elif [ $confirmaInstalacion = "SI" ]
-	then
+		then
 		Crear_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	fi
 }
@@ -70,6 +70,16 @@ Crear_Directorios()
 
 	####aca tambien hay que copiar archivos
 	####y por ultimo, crear fnoc.conf
+}
+
+Ejecutar_Instalador_Con_Parametros()
+{
+	if [ $1 = "-r" ]
+			then
+				Verificar_Existencia_Archivo_Configuracion
+			else
+				echo "No es una linea de comnado valida."
+	fi
 }
 
 Verificar_Existencia_Archivo_Configuracion()
@@ -93,6 +103,6 @@ then
 fi
 case $# in
 	0) Pedir_Nombres_Directorios ejec mae ext acep rech proc rep logs;;
-	1) Verificar_Existencia_Archivo_Configuracion ;;
+	1) Ejecutar_Instalador_Con_Parametros $1 ;;
 	*) echo "No es una linea de comnado valida.";;
 esac
