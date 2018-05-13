@@ -8,7 +8,7 @@ Pedir_Nombres_Directorios()
 {
 	directorioVacio=""
 	echo "Todos sus directorios serán creados en $grupo"
-	
+
 	valido=false
 	while [ $valido = false ]
 	do
@@ -16,7 +16,7 @@ Pedir_Nombres_Directorios()
 		read dirEjecutables
 		Validar_Nombre $dirEjecutables
 	done
-	
+
 	valido=false
 	while [ $valido = false ]
 	do
@@ -140,7 +140,7 @@ Estado de la instalación: LISTA
 		echo "Vuelva a ingresar los nombres de los directorios"
 		Pedir_Nombres_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	elif [ $confirmaInstalacion = "SI" ]
-	then
+		then
 		Crear_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	fi
 }
@@ -196,6 +196,16 @@ Crear_Archivo_Configuracion()
 	echo "Logs-$dirLogs-$USER-$fecha" >> $archivofConf
 }
 
+Ejecutar_Instalador_Con_Parametros()
+{
+	if [ $1 = "-r" ]
+	then
+		Verificar_Existencia_Archivo_Configuracion
+	else
+		echo "No es una línea de comando válida."
+	fi
+}
+
 Verificar_Existencia_Archivo_Configuracion()
 {
 	if [ -f $archivofConf ]
@@ -205,22 +215,6 @@ Verificar_Existencia_Archivo_Configuracion()
 	else
 		echo "No instalado. Imposible de reparar."
 	fi
-}
-
-Instalar()
-{
-	VERSION=$(perl -e 'print $];')
-
-	if [ $VERSION \< "5" ]
-	then
-		echo "Tiene que tener instalado Perl 5 o más."
-		exit
-	fi
-	case $# in
-		0) Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs";;
-		1) Verificar_Existencia_Archivo_Configuracion ;;
-		*) echo "No es una línea de comando válida.";;
-	esac
 }
 
 Mostrar_Datos_Instalacion()
@@ -304,24 +298,40 @@ Esta_Sano_fConf()
 	fi
 }
 
-
-####Instalacion
-if [ -e	 $archivofConf ]
-then
-	Esta_Sano_fConf
-	if [ $archivofConfEstaSano = true ]
+Instalacion()
+{
+	if [ -e	 $archivofConf ]
 	then
-		Existen_Todos_Directorios
-		if [ $existenTodosDirectorios = true ]
+		Esta_Sano_fConf
+		if [ $archivofConfEstaSano = true ]
 		then
-			Mostrar_Datos_Instalacion
+			Existen_Todos_Directorios
+			if [ $existenTodosDirectorios = true ]
+			then
+				Mostrar_Datos_Instalacion
+			else
+				Modulo_Reparacion
+			fi
 		else
-			Modulo_Reparacion
+			echo "El archivo de configuración está dañado. Imposible continuar."
 		fi
 	else
-		echo "El archivo de configuración está dañado. Imposible continuar."
+		Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs"
 	fi
-else
-	Instalar
+}
+
+
+
+VERSION=$(perl -e 'print $];')
+
+if [ $VERSION \< "5" ]
+then
+	echo "Tiene que tener instalado Perl 5 o más."
+	exit
 fi
+case $# in
+	0) Instalacion ;;
+	1) Ejecutar_Instalador_Con_Parametros $1 ;;
+	*) echo "No es una línea de comando válida.";;
+esac
 
