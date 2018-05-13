@@ -1,27 +1,113 @@
 grupo=/Grupo4
-archivofConf=/Grupo4/dirconf/fnoc.conf
+valido=false
+archivofConf=$HOME/Grupo4/dirconf/fnoc.conf
 
 Pedir_Nombres_Directorios()
 {
-	echo "Defina el directorio de ejecutables ($grupo/$1):"
-	read dirEjecutables
-	echo "Defina el directorio de archivos maestros ($grupo/$2):"
-	read dirMaestros
-	echo "Defina el directorio de arribo de archivos externos ($grupo/$3):"
-	read dirExternos
-	echo "Defina el directorio de novedades aceptadas ($grupo/$4):"
-	read dirAceptados
-	echo "Defina el directorio de archivos rechazados ($grupo/$5):"
-	read dirRechazados
-	echo "Defina el directorio de archivos procesados ($grupo/$6):"
-	read dirProcesados
-	echo "Defina el directorio de reportes ($grupo/$7):"
-	read dirReportes
-	echo "Defina el directorio de logs de auditoría del sistema ($grupo/$8):"
-	read dirLogs
-	###faltan validaciones
+	directorioVacio=""
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de ejecutables ($grupo/$1):"
+		read dirEjecutables
+		Validar_Nombre $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de archivos maestros ($grupo/$2):"
+		read dirMaestros
+		Validar_Nombre $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de arribo de archivos externos ($grupo/$3):"
+		read dirExternos
+		Validar_Nombre $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de novedades aceptadas ($grupo/$4):"
+		read dirAceptados
+		Validar_Nombre $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de archivos rechazados ($grupo/$5):"
+		read dirRechazados
+		Validar_Nombre $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de archivos procesados ($grupo/$6):"
+		read dirProcesados
+		Validar_Nombre $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de reportes ($grupo/$7):"
+		read dirReportes
+		Validar_Nombre $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
+
+	valido=false
+	while [ $valido = false ]
+	do
+		echo "Defina el directorio de logs de auditoría del sistema ($grupo/$8):"
+		read dirLogs
+		Validar_Nombre $dirLogs $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+	done
 
 	Pedir_Confirmacion
+}
+
+####Validar_Nombre recibe varios parametros: primero el directorio actual y despues los anteriormente ingresados
+Validar_Nombre()
+{
+	if [ $1 = "$directorioVacio" ]
+	then
+		valido=false
+	elif [ $1 = "dirconf" ]
+	then
+		valido=false
+	else
+		valido=true
+	fi
+
+	####valido que sea diferente a los anteriormente ingresados
+	let	contador=0
+	for i in $@
+	do
+		let contador=contador+1
+		###que $contador sea > que 1 para que no se compare con si mismo
+		if [ $contador \> "1" -a $1 = $i ]
+		then
+			valido=false
+		fi
+	done
+
+	####valido que no exista el uno ya creado con ese nombre
+	if [ -e $HOME/$grupo/$1 ]
+	then
+		valido=false
+	fi
+
+	if [ $valido = false ]
+	then
+		echo "Nombre de directorio inválido."
+	fi
 }
 
 Pedir_Confirmacion()
@@ -68,8 +154,43 @@ Crear_Directorios()
 	mkdir $HOME/$grupo/$8
 	echo "Directorios creados exitosamente"
 
-	####aca tambien hay que copiar archivos
-	####y por ultimo, crear fnoc.conf
+	Mover_Archivos
+	Crear_Archivo_Configuracion
+}
+
+Mover_Archivos()
+{
+	rutaMaestros="$HOME/Grupo4/$dirMaestros/"
+
+	archivoAMover="$HOME/Grupo4/archivostp/T1.tab"
+	mv $archivoAMover $rutaMaestros
+
+	archivoAMover="$HOME/Grupo4/archivostp/T2.tab"
+	mv $archivoAMover $rutaMaestros
+
+	archivoAMover="$HOME/Grupo4/archivostp/p-s.mae"
+	mv $archivoAMover $rutaMaestros
+
+	archivoAMover="$HOME/Grupo4/archivostp/PPI.mae"
+	mv $archivoAMover $rutaMaestros
+
+	####los otros archivos hay que moverlos tambien????
+}
+
+Crear_Archivo_Configuracion()
+{
+	fecha=$(date +"%d/%m/%y %H:%M:%S")
+
+	####esto agrega una linea a lo ultimo del archivo
+	####si el archivo no existe lo crea
+	echo "ejecutables-$dirEjecutables-$USER-$fecha" >> $archivofConf
+	echo "maestros-$dirMaestros-$USER-$fecha" >> $archivofConf
+	echo "externos-$dirExternos-$USER-$fecha" >> $archivofConf
+	echo "aceptados-$dirAceptados-$USER-$fecha" >> $archivofConf
+	echo "rechazados-$dirRechazados-$USER-$fecha" >> $archivofConf
+	echo "procesados-$dirProcesados-$USER-$fecha" >> $archivofConf
+	echo "reportes-$dirReportes-$USER-$fecha" >> $archivofConf
+	echo "logs-$dirLogs-$USER-$fecha" >> $archivofConf
 }
 
 Ejecutar_Instalador_Con_Parametros()
@@ -84,7 +205,7 @@ Ejecutar_Instalador_Con_Parametros()
 
 Verificar_Existencia_Archivo_Configuracion()
 {
-	if [ -f archivofConf ]
+	if [ -f $archivofConf ]
 	then
 		echo "Instalado"
 		###Falta verificacion de salud y reparacion
@@ -102,7 +223,7 @@ then
 	exit
 fi
 case $# in
-	0) Pedir_Nombres_Directorios ejec mae ext acep rech proc rep logs;;
+	0) Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs";;
 	1) Ejecutar_Instalador_Con_Parametros $1 ;;
-	*) echo "No es una linea de comnado valida.";;
+	*) echo "No es una línea de comando válida.";;
 esac
