@@ -1,15 +1,18 @@
-grupo=/Grupo4
+grupo=$HOME/Grupo4
 valido=false
 archivofConf=$HOME/Grupo4/dirconf/fnoc.conf
+existenTodosDirectorios=true
+archivofConfEstaSano=true
 
 Pedir_Nombres_Directorios()
 {
 	directorioVacio=""
+	echo "Todos sus directorios serán creados en $grupo"
 	
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de ejecutables ($grupo/$1):"
+		echo "Defina el directorio de ejecutables ($1):"
 		read dirEjecutables
 		Validar_Nombre $dirEjecutables
 	done
@@ -17,7 +20,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de archivos maestros ($grupo/$2):"
+		echo "Defina el directorio de archivos maestros ($2):"
 		read dirMaestros
 		Validar_Nombre $dirMaestros $dirEjecutables
 	done
@@ -25,7 +28,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de arribo de archivos externos ($grupo/$3):"
+		echo "Defina el directorio de arribo de archivos externos ($3):"
 		read dirExternos
 		Validar_Nombre $dirExternos $dirMaestros $dirEjecutables
 	done
@@ -33,7 +36,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de novedades aceptadas ($grupo/$4):"
+		echo "Defina el directorio de novedades aceptadas ($4):"
 		read dirAceptados
 		Validar_Nombre $dirAceptados $dirExternos $dirMaestros $dirEjecutables
 	done
@@ -41,7 +44,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de archivos rechazados ($grupo/$5):"
+		echo "Defina el directorio de archivos rechazados ($5):"
 		read dirRechazados
 		Validar_Nombre $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
 	done
@@ -49,7 +52,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de archivos procesados ($grupo/$6):"
+		echo "Defina el directorio de archivos procesados ($6):"
 		read dirProcesados
 		Validar_Nombre $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
 	done
@@ -57,7 +60,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de reportes ($grupo/$7):"
+		echo "Defina el directorio de reportes ($7):"
 		read dirReportes
 		Validar_Nombre $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
 	done
@@ -65,7 +68,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de logs de auditoría del sistema ($grupo/$8):"
+		echo "Defina el directorio de logs de auditoría del sistema ($8):"
 		read dirLogs
 		Validar_Nombre $dirLogs $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
 	done
@@ -99,7 +102,7 @@ Validar_Nombre()
 	done
 
 	####valido que no exista el uno ya creado con ese nombre
-	if [ -e $HOME/$grupo/$1 ]
+	if [ -e $grupo/$1 ]
 	then
 		valido=false
 	fi
@@ -134,7 +137,7 @@ Estado de la instalación: LISTA
 
 	if [ $confirmaInstalacion = "NO" ]
 	then
-		echo "\nVuelva a ingresar los nombres de los directorios"
+		echo "Vuelva a ingresar los nombres de los directorios"
 		Pedir_Nombres_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	elif [ $confirmaInstalacion = "SI" ]
 	then
@@ -144,14 +147,14 @@ Estado de la instalación: LISTA
 
 Crear_Directorios()
 {
-	mkdir $HOME/$grupo/$1
-	mkdir $HOME/$grupo/$2
-	mkdir $HOME/$grupo/$3
-	mkdir $HOME/$grupo/$4
-	mkdir $HOME/$grupo/$5
-	mkdir $HOME/$grupo/$6
-	mkdir $HOME/$grupo/$7
-	mkdir $HOME/$grupo/$8
+	mkdir $grupo/$1
+	mkdir $grupo/$2
+	mkdir $grupo/$3
+	mkdir $grupo/$4
+	mkdir $grupo/$5
+	mkdir $grupo/$6
+	mkdir $grupo/$7
+	mkdir $grupo/$8
 	echo "Directorios creados exitosamente"
 
 	Mover_Archivos
@@ -160,18 +163,18 @@ Crear_Directorios()
 
 Mover_Archivos()
 {
-	rutaMaestros="$HOME/Grupo4/$dirMaestros/"
+	rutaMaestros="$grupo/$dirMaestros/"
 
-	archivoAMover="$HOME/Grupo4/archivostp/T1.tab"
+	archivoAMover="$grupo/archivostp/T1.tab"
 	mv $archivoAMover $rutaMaestros
 
-	archivoAMover="$HOME/Grupo4/archivostp/T2.tab"
+	archivoAMover="$grupo/archivostp/T2.tab"
 	mv $archivoAMover $rutaMaestros
 
-	archivoAMover="$HOME/Grupo4/archivostp/p-s.mae"
+	archivoAMover="$grupo/archivostp/p-s.mae"
 	mv $archivoAMover $rutaMaestros
 
-	archivoAMover="$HOME/Grupo4/archivostp/PPI.mae"
+	archivoAMover="$grupo/archivostp/PPI.mae"
 	mv $archivoAMover $rutaMaestros
 
 	####los otros archivos hay que moverlos tambien????
@@ -179,18 +182,18 @@ Mover_Archivos()
 
 Crear_Archivo_Configuracion()
 {
-	fecha=$(date +"%d/%m/%y %H:%M:%S")
+	fecha=$(date +"%d/%m/%y,%H:%M:%S")
 
 	####esto agrega una linea a lo ultimo del archivo
 	####si el archivo no existe lo crea
-	echo "ejecutables-$dirEjecutables-$USER-$fecha" >> $archivofConf
-	echo "maestros-$dirMaestros-$USER-$fecha" >> $archivofConf
-	echo "externos-$dirExternos-$USER-$fecha" >> $archivofConf
-	echo "aceptados-$dirAceptados-$USER-$fecha" >> $archivofConf
-	echo "rechazados-$dirRechazados-$USER-$fecha" >> $archivofConf
-	echo "procesados-$dirProcesados-$USER-$fecha" >> $archivofConf
-	echo "reportes-$dirReportes-$USER-$fecha" >> $archivofConf
-	echo "logs-$dirLogs-$USER-$fecha" >> $archivofConf
+	echo "Ejecutables-$dirEjecutables-$USER-$fecha" >> $archivofConf
+	echo "Maestros-$dirMaestros-$USER-$fecha" >> $archivofConf
+	echo "Externos-$dirExternos-$USER-$fecha" >> $archivofConf
+	echo "Aceptados-$dirAceptados-$USER-$fecha" >> $archivofConf
+	echo "Rechazados-$dirRechazados-$USER-$fecha" >> $archivofConf
+	echo "Procesados-$dirProcesados-$USER-$fecha" >> $archivofConf
+	echo "Reportes-$dirReportes-$USER-$fecha" >> $archivofConf
+	echo "Logs-$dirLogs-$USER-$fecha" >> $archivofConf
 }
 
 Verificar_Existencia_Archivo_Configuracion()
@@ -204,16 +207,121 @@ Verificar_Existencia_Archivo_Configuracion()
 	fi
 }
 
+Instalar()
+{
+	VERSION=$(perl -e 'print $];')
 
-VERSION=$(perl -e 'print $];')
+	if [ $VERSION \< "5" ]
+	then
+		echo "Tiene que tener instalado Perl 5 o más."
+		exit
+	fi
+	case $# in
+		0) Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs";;
+		1) Verificar_Existencia_Archivo_Configuracion ;;
+		*) echo "No es una línea de comando válida.";;
+	esac
+}
 
-if [ $VERSION \< "5" ]
+Mostrar_Datos_Instalacion()
+{
+	echo "La instalación está completa."
+	while IFS='-' read -r input1 input2 input3 input4
+	do
+		echo "$input1 en el directorio: $grupo/$input2"
+	done < $archivofConf
+}
+
+Existen_Todos_Directorios()
+{
+	while IFS='-' read -r input1 input2 input3 input4
+	do
+		if [ ! -e $grupo/$input2 ]
+		then
+			existenTodosDirectorios=false
+		fi
+	done < $archivofConf
+}
+
+Reparar()
+{
+	####Si faltaban directorios los creo
+	while IFS='-' read -r input1 input2 input3 input4
+	do
+		if [ ! -e $grupo/$input2 ]
+		then
+			mkdir $grupo/$input2
+		fi
+	done < $archivofConf
+
+	echo "Instalación reparada exitosamente."
+}
+
+Modulo_Reparacion()
+{
+	echo "La instalación está incompleta. ¿Desea repararla? (SI-NO):"
+	read reparar
+	while [ $reparar != "NO" -a $reparar != "SI" ]
+	do
+		echo "Ingrese SI o NO"
+		read reparar
+	done
+	
+	if [ $reparar = "SI" ]	
+	then
+		Reparar
+	else
+		exit
+	fi
+}
+
+Esta_Sano_fConf()
+{
+	####verifico que el archivo tenga 8 lineas, una por cada directorio
+	let contador=0
+	while read -r linea
+	do
+		let contador=contador+1
+	done < $archivofConf
+
+	if [ $contador -ne 8 ]
+	then
+		archivofConfEstaSano=false
+	fi
+
+	####verifico que las 8 lineas tengan 3 guiones (quiere decir que hay 4 campos) 
+	####y que minimamente todos los campos tengan un caracter y luego cualquier cosa (que no sea un campo vacio)
+	lineasQueCumplenRE=$(grep '..*-..*-..*-..*' $archivofConf)
+	let contador=0
+	for linea in $lineasQueCumplenRE
+	do
+		let contador=contador+1
+	done
+
+	if [ $contador -ne 8 ]
+	then
+		archivofConfEstaSano=false
+	fi
+}
+
+
+####Instalacion
+if [ -e	 $archivofConf ]
 then
-	echo "Tiene que tener instalado Perl 5 o más."
-	exit
+	Esta_Sano_fConf
+	if [ $archivofConfEstaSano = true ]
+	then
+		Existen_Todos_Directorios
+		if [ $existenTodosDirectorios = true ]
+		then
+			Mostrar_Datos_Instalacion
+		else
+			Modulo_Reparacion
+		fi
+	else
+		echo "El archivo de configuración está dañado. Imposible continuar."
+	fi
+else
+	Instalar
 fi
-case $# in
-	0) Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs";;
-	1) Verificar_Existencia_Archivo_Configuracion ;;
-	*) echo "No es una línea de comando válida.";;
-esac
+
