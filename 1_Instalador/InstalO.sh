@@ -198,6 +198,7 @@ Crear_Archivo_Configuracion()
 
 Ejecutar_Instalador_Con_Parametros()
 {
+	#Por ahora solo tenemos -r pero podemos extenderlo a otras funcionalidades
 	if [ $1 = "-r" ]
 	then
 		if [ -e	 $archivofConf ]
@@ -214,17 +215,6 @@ Ejecutar_Instalador_Con_Parametros()
 		fi
 	else
 		echo "No es una línea de comando válida."
-	fi
-}
-
-Verificar_Existencia_Archivo_Configuracion()
-{
-	if [ -f $archivofConf ]
-	then
-		echo "Instalado"
-		###Falta verificacion de salud y reparacion
-	else
-		echo "No instalado. Imposible de reparar."
 	fi
 }
 
