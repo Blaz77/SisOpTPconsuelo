@@ -200,7 +200,18 @@ Ejecutar_Instalador_Con_Parametros()
 {
 	if [ $1 = "-r" ]
 	then
-		Verificar_Existencia_Archivo_Configuracion
+		if [ -e	 $archivofConf ]
+		then
+			Esta_Sano_fConf
+			if [ $archivofConfEstaSano = true ]
+			then
+					Reparar
+			else
+				echo "El archivo de configuración está dañado. Imposible reparar."
+			fi
+		else
+			echo "El archivo de configuración no existe. Vuelva a instalar."
+		fi
 	else
 		echo "No es una línea de comando válida."
 	fi
@@ -260,8 +271,8 @@ Modulo_Reparacion()
 		echo "Ingrese SI o NO"
 		read reparar
 	done
-	
-	if [ $reparar = "SI" ]	
+
+	if [ $reparar = "SI" ]
 	then
 		Reparar
 	else
@@ -283,7 +294,7 @@ Esta_Sano_fConf()
 		archivofConfEstaSano=false
 	fi
 
-	####verifico que las 8 lineas tengan 3 guiones (quiere decir que hay 4 campos) 
+	####verifico que las 8 lineas tengan 3 guiones (quiere decir que hay 4 campos)
 	####y que minimamente todos los campos tengan un caracter y luego cualquier cosa (que no sea un campo vacio)
 	lineasQueCumplenRE=$(grep '..*-..*-..*-..*' $archivofConf)
 	let contador=0
@@ -334,4 +345,3 @@ case $# in
 	1) Ejecutar_Instalador_Con_Parametros $1 ;;
 	*) echo "No es una línea de comando válida.";;
 esac
-
