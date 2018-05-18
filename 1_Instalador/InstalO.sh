@@ -221,17 +221,20 @@ Ejecutar_Instalador_Con_Parametros()
 Mostrar_Datos_Instalacion()
 {
 	echo "La instalación está completa."
-	while IFS='-' read -r input1 input2 input3 input4
+	while read -r linea
 	do
-		echo "$input1 en el directorio: $grupo/$input2"
+		archivosTipo=$(echo $linea | cut -d '-' -f 1)
+		directorioElegido=$(echo $linea | cut -d '-' -f 2)
+		echo "$archivosTipo en el directorio: $grupo/$directorioElegido"
 	done < $archivofConf
 }
 
 Existen_Todos_Directorios()
 {
-	while IFS='-' read -r input1 input2 input3 input4
+	while read -r linea
 	do
-		if [ ! -e $grupo/$input2 ]
+		directorioElegido=$(echo $linea | cut -d '-' -f 2)
+		if [ ! -e $grupo/$directorioElegido ]
 		then
 			existenTodosDirectorios=false
 		fi
@@ -241,11 +244,12 @@ Existen_Todos_Directorios()
 Reparar()
 {
 	####Si faltaban directorios los creo
-	while IFS='-' read -r input1 input2 input3 input4
+	while read -r linea
 	do
-		if [ ! -e $grupo/$input2 ]
+		directorioElegido=$(echo $linea | cut -d '-' -f 2)
+		if [ ! -e $grupo/$directorioElegido ]
 		then
-			mkdir $grupo/$input2
+			mkdir $grupo/$directorioElegido
 		fi
 	done < $archivofConf
 
