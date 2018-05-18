@@ -1,3 +1,17 @@
+configFile=../dirconf/fnoc.conf
+
+Leer_Config()
+{
+	exDIR_EXEC=grep '^Ejecutables.*' $configFile | cut -f2 -d'-'
+	exDIR_MASTER=grep '^Maestros.*' $configFile | cut -f2 -d'-'
+	exDIR_EXT=grep '^Externos.*' $configFile | cut -f2 -d'-'
+	exDIR_ACCEPT=grep '^Aceptados.*' $configFile | cut -f2 -d'-'
+	exDIR_REFUSE=grep '^Rechazados.*' $configFile | cut -f2 -d'-'
+	exDIR_PROCESS=grep '^Procesados.*' $configFile | cut -f2 -d'-'
+	exDIR_REPORTSgrep '^Reportes.*' $configFile | cut -f2 -d'-'
+	exDIR_LOGS=grep '^Logs.*' $configFile | cut -f2 -d'-'
+}
+
 # Validar existencia de archivos y directorios segun archivo de configuracion
 Verificar_Directorios()
 {
