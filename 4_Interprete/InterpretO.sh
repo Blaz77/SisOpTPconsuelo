@@ -1,5 +1,6 @@
 grupo=$HOME/Grupo4
 fnoc=$grupo/dirconf/fnoc.conf
+directorioAceptados=$HOME/Grupo4/acep
 
 	###Busco directorio de maestros en el archivo de configuracion
 	# lineaMaestros=$(grep '^Maestros-' $fnoc)
@@ -29,14 +30,24 @@ fnoc=$grupo/dirconf/fnoc.conf
 	#  delimitador_decimal=$(echo $regex | cut -c 7)
 	#  echo "Delimitador decimal: $delimitador_decimal"
 	# done
+
 Procesar()
 {
-	echo "Procesando"
+	#Fijate que a directorioAceptados ponele el nombre que vos le pusiste al crearlo
+	#Esa variable nos la tiene que dar InicializO.sh
+	if [ -e $grupo/$directorioAceptados ]
+		then
+			echo "Si existen archivos a procesar"
+			#Procesar cada archivo
+	else
+		echo "No hay archivos para ser procesados."
+	fi
 }
 
 VerificarEstadoInicializacion()
 {
 	#Asigno true para hacer pruebas
+	#Aunque tal vez sea una variable dada por Instalo.sh
 	FueBienInicializado=true;
 }
 
