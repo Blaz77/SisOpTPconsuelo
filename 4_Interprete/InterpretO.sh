@@ -53,6 +53,7 @@ EvaluarArchivos()
 		if [ $ElArchivoEsValido = true ]
 		then
 			Procesar_Archivo
+			Mover_Archivo
 	 	else
 			echo "El archivo $archivo ya había sido procesado."
 	 	fi
@@ -80,6 +81,7 @@ Procesar_Archivo()
 	###No se por que el while no lee la ultima linea del archivo
 	while read -r linea
 	do
+		ResetearCampos
 		let contador=1
 		while [ $contador -le $cantidadCampos ]
 		do
@@ -89,18 +91,24 @@ Procesar_Archivo()
 
 		InterpretarFecha
 		InterpretarMontos
-		
-		fecha=$(date +"%Y%m%d")
-		if [ ! -e $directorioProcesados/$fecha ]
-		then
-			mkdir $directorioProcesados/$fecha
-		fi
-		directorioDelDia="$directorioProcesados/$fecha"
-		mv $archivo $directorioDelDia
+		GrabarArchivo
 
-		###Grabar nuevo archivo: va a tener 16 campos
-		echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> $directorioProcesados/PRESTAMOS.$nombrePais
 	done < $archivo
+}
+
+ResetearCampos()
+{
+	CTB_FE=""
+	CTB_ESTADO=""
+	PRES_ID=""
+	MT_PRES=""
+	MT_IMPAGO=""
+	MT_INDE=""
+	MT_INNODE=""
+	MT_DEB=""
+	MT_REST=""
+	PRES_CLI_ID=""
+	PRES_CLI=""
 }
 
 GuardarCampos()
@@ -201,6 +209,40 @@ InterpretarMontos()
 	MT_DEB=$(echo $MT_DEB | sed s/"^$"/"0"/)
 
 	MT_REST=$(echo "$MT_PRES+$MT_IMPAGO+$MT_INDE+$MT_INNODE-$MT_DEB" | bc -l)
+
+	#echo "mt pres: $MT_PRES"
+	#echo "mt impago: $MT_IMPAGO"
+	#echo "mt inde: $MT_INDE"
+	#echo "mt innode: $MT_INNODE"
+	#echo "mt deb: $MT_DEB"
+	#echo "mt rest: $MT_REST"
+	#echo ""
+}
+
+GrabarArchivo()
+{
+	###Reemplazo los puntos por comas para tener el formato de números pedido
+	MT_PRES=$(echo $MT_PRES | sed s/"\."/","/)
+	MT_IMPAGO=$(echo $MT_IMPAGO | sed s/"\."/","/)
+	MT_INDE=$(echo $MT_INDE | sed s/"\."/","/)
+	MT_INNODE=$(echo $MT_INNODE | sed s/"\."/","/)
+	MT_DEB=$(echo $MT_DEB | sed s/"\."/","/)
+	MT_REST=$(echo $MT_REST | sed s/"\."/","/)
+
+	###Grabar nuevo archivo: va a tener 16 campos
+	echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> $directorioProcesados/PRESTAMOS.$nombrePais
+}
+
+Mover_Archivo()
+{
+	###Creo directorio del día si es que no existe y muevo el archivo procesado
+	fecha=$(date +"%Y%m%d")
+	if [ ! -e $directorioProcesados/$fecha ]
+	then
+		mkdir $directorioProcesados/$fecha
+	fi
+	directorioDelDia="$directorioProcesados/$fecha"
+	mv $archivo $directorioDelDia
 }
 
 ValidarSiYaFueProcesadoElArchivo()
