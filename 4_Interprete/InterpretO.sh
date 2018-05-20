@@ -90,6 +90,14 @@ Procesar_Archivo()
 		InterpretarFecha
 		InterpretarMontos
 		
+		fecha=$(date +"%Y%m%d")
+		if [ ! -e $directorioProcesados/$fecha ]
+		then
+			mkdir $directorioProcesados/$fecha
+		fi
+		directorioDelDia="$directorioProcesados/$fecha"
+		mv $archivo $directorioDelDia
+
 		###Grabar nuevo archivo: va a tener 16 campos
 		echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> $directorioProcesados/PRESTAMOS.$nombrePais
 	done < $archivo
