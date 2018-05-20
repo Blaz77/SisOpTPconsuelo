@@ -1,8 +1,10 @@
 grupo=$HOME/Grupo4
 valido=false
 archivofConf=$HOME/Grupo4/dirconf/fnoc.conf
+archivoLogInstalacion=$HOME/Grupo4/dirconf/instalo.log
 existenTodosDirectorios=true
 archivofConfEstaSano=true
+source Logger.sh
 
 Pedir_Nombres_Directorios()
 {
@@ -159,6 +161,7 @@ Crear_Directorios()
 
 	Mover_Archivos
 	Crear_Archivo_Configuracion
+	Crear_Log_Instalacion
 }
 
 Mover_Archivos()
@@ -194,6 +197,11 @@ Crear_Archivo_Configuracion()
 	echo "Procesados-$dirProcesados-$USER-$fecha" >> $archivofConf
 	echo "Reportes-$dirReportes-$USER-$fecha" >> $archivofConf
 	echo "Logs-$dirLogs-$USER-$fecha" >> $archivofConf
+}
+
+Crear_Log_Instalacion()
+{
+	LogearMensaje ${FUNCNAME[0]} "INF" "Creando log de instalacion" $archivoLogInstalacion
 }
 
 Ejecutar_Instalador_Con_Parametros()

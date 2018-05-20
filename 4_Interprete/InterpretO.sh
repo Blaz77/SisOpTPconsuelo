@@ -1,18 +1,21 @@
 grupo=$HOME/Grupo4
+source $HOME/SisOpTPconsuelo/4_Interprete/Logger.sh
 
 #Estas variables deberian venir seteadas desde InicializO.sh
 directorioAceptados=$HOME/Grupo4/acep
 directorioArchivosMaestros=$HOME/Grupo4/mae
 directorioProcesados=$HOME/Grupo4/proc
+directorioLogs=$HOME/Grupo4/losg
+
+archivoLogInterprete=$HOME/Grupo4/losg/InterpretO.log
 
 Procesar()
 {
 	#Fijate que a directorioAceptados ponele el nombre que vos le pusiste al crearlo
 	#Esa variable nos la tiene que dar InicializO.sh
+	LogearMensaje ${FUNCNAME[0]} "INF" "Procesando archivos" $archivoLogInterprete
 	if [ -e $directorioAceptados ]
 		then
-			echo "Si existen archivos a procesar"
-			#Procesar cada archivo
 			EvaluarArchivos
 	else
 		echo "No hay archivos para ser procesados."
@@ -22,7 +25,6 @@ Procesar()
 EvaluarArchivos()
 {
 	###Busco archivo T1
-	echo "evaluacion"
 	archivoT1=$directorioArchivosMaestros/T1.tab
 
 	#Busco todos los archivos a procesar
