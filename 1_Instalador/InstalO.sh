@@ -223,8 +223,8 @@ Mostrar_Datos_Instalacion()
 	echo "La instalación está completa."
 	while read -r linea
 	do
-		archivosTipo=$(echo $linea | cut -d '-' -f 1)
-		directorioElegido=$(echo $linea | cut -d '-' -f 2)
+		archivosTipo=$(echo $linea | cut -d '-' -f1)
+		directorioElegido=$(echo $linea | cut -d '-' -f2)
 		echo "$archivosTipo en el directorio: $grupo/$directorioElegido"
 	done < $archivofConf
 }
@@ -233,7 +233,7 @@ Existen_Todos_Directorios()
 {
 	while read -r linea
 	do
-		directorioElegido=$(echo $linea | cut -d '-' -f 2)
+		directorioElegido=$(echo $linea | cut -d '-' -f2)
 		if [ ! -e $grupo/$directorioElegido ]
 		then
 			existenTodosDirectorios=false
@@ -246,7 +246,7 @@ Reparar()
 	####Si faltaban directorios los creo
 	while read -r linea
 	do
-		directorioElegido=$(echo $linea | cut -d '-' -f 2)
+		directorioElegido=$(echo $linea | cut -d '-' -f2)
 		if [ ! -e $grupo/$directorioElegido ]
 		then
 			mkdir $grupo/$directorioElegido
