@@ -1,3 +1,5 @@
+#!/bin/bash
+
 grupo=$HOME/Grupo4
 configFile=../dirconf/fnoc.conf
 pidRecordFile=

@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Detector de novedades
 # Se ejecuta en background . ./DetectO.sh &
 # Cambiar llamadas al logger

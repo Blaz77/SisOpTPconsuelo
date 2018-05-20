@@ -1,3 +1,5 @@
+#!/bin/bash
+
 grupo=$HOME/Grupo4
 valido=false
 archivofConf=$HOME/Grupo4/dirconf/fnoc.conf

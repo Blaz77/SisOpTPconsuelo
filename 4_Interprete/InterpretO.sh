@@ -1,3 +1,5 @@
+#!/bin/bash
+
 grupo=$HOME/Grupo4
 source $HOME/SisOpTPconsuelo/Logger.sh
 
