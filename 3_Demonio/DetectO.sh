@@ -1,10 +1,44 @@
-#!/bin/bash
-
-# Detector de novedades
 # Se ejecuta en background . ./DetectO.sh &
 # Cambiar llamadas al logger
+# Cambiar $INIT_OK
 # Cambiar $DIRECTORIO_ARRIBOS
+# Cambiar $DIRECTORIO_ACEPTADOS
+# Cambiar $DIRECTORIO_RECHAZADOS
 
+######################################################### Funciones auxiliares #########################################################
+
+Invocar_interprete()
+{
+	# Invocar al interprete si no se encuentra en ejecucion
+	# registro que sucedio con la invocacion [LOG]
+
+	echo "debug:"	
+}
+
+Mover_archivos_rechazados()
+{
+	echo "debug: Moviendo todos los archivos no aceptados"
+
+	# Recorro los nombres de los archivos en el directorio de arribos no aceptados
+	for archivo_rechazado in $(cd $DIRECTORIO_ARRIBOS && ls)
+	do
+		# [DEBUG]: Borrar
+	    echo "Moviendo archivo: $archivo_rechazado"
+
+	    mv $DIRECTORIO_ARRIBOS/$archivo_rechazado $DIRECTORIO_RECHAZADOS/$archivo_rechazado
+
+	done 
+}
+
+Mover_a_carpeta_aceptados()
+{
+	# [DEBUG]
+	echo "debug: Moviendo archivo aceptado: $1"
+
+	# [LOG] archivo aceptado: $1
+
+	mv $DIRECTORIO_ARRIBOS/$1 $DIRECTORIO_ACEPTADOS/$1
+}
 
 Verificar_archivo_recibido()
 {
@@ -28,20 +62,32 @@ Verificar_archivo_recibido()
 	return 1
 }
 
+Verifico_inicializacion()
+{
+	if [ $INIT_OK == false ]
+	then
+		# [LOG]: El sistema no esta correctamente inicializado
+		echo "El sistema no esta correctamente inicializado."
+		
+		exit 1
+	fi	
+	
+	# [LOG]: El sistema esta correctamente inicializado
+	echo "El sistema esta correctamente inicializado."	
+}
+
+######################################################### Detector de novedades #########################################################
+
 # [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
 INIT_OK=true
 
-#Verifico variable de inicializacion correcta
-if [ $INIT_OK == false ]
-then
-	echo "El sistema no esta correctamente inicializado."
-	# [LOG]: El sistema no esta correctamente inicializado
-	exit 1
+Verifico_inicializacion
 
-fi	
-
-# [LOG]: El sistema esta correctamente inicializado
-echo "El sistema esta correctamente inicializado."
+# Seteo variables de ambiente
+# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
+DIRECTORIO_ARRIBOS=/home/jleyes/ARRIBOS
+DIRECTORIO_ACEPTADOS=/home/jleyes/Aceptados
+DIRECTORIO_RECHAZADOS=/home/jleyes/Rechazados
 
 # Cuento los ciclos
 numero_ciclo=1
@@ -50,29 +96,32 @@ while true
 do
 	# registro el numero de ciclo [LOG]
 
-	# [Leo variable de ambiente con carpeta de arribos]
-	# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
-	DIRECTORIO_ARRIBOS=/home/jleyes/ARRIBOS
-
 	# Recorro los nombres de los archivos en el directorio de arribos y filtro por extension .txt
-	for linea in $(cd $DIRECTORIO_ARRIBOS && ls *.txt)
+	for nombre_archivo in $(cd $DIRECTORIO_ARRIBOS && ls *.txt)
 	do
 		# [DEBUG]: Borrar
-	    echo $linea
+	    echo $nombre_archivo
 
 	    # Analizo el archivo
-	    Verificar_archivo_recibido $linea	
+	    Verificar_archivo_recibido $nombre_archivo	
 
 	    # Guardo el resultado del analisis del archivo
     	archivo_valido=$?
 
-    	# [DEBUG]: Borrar
-    	echo "Es valido: $archivo_valido"
+    	if [ $archivo_valido == 1 ]
+		then
+			# [DEBUG]: Borrar
+    		echo "Es valido: $archivo_valido"
+
+			Mover_a_carpeta_aceptados $nombre_archivo
+    	fi
 
 	done  
+
+	# Muevo todos los archivos que no fueron aceptados
+	Mover_archivos_rechazados
 	
-	# Invocar al interprete si no se encuentra en ejecucion
-	# registro que sucedio con la invocacion [LOG]
+	Invocar_interprete
 
 	numero_ciclo=$(($numero_ciclo + 1))
 
