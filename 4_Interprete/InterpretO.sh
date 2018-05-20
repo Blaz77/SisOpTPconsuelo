@@ -9,7 +9,7 @@ directorioArchivosMaestros=$HOME/Grupo4/mae
 directorioProcesados=$HOME/Grupo4/proc
 
 directorioLogs=$HOME/Grupo4/losg
-archivoLogInterprete=$HOME/Grupo4/losg/InterpretO.log
+archivoLogInterprete=$HOME/Grupo4/logs/InterpretO.log
 
 archivoT1=$directorioArchivosMaestros/T1.tab
 archivoT2=$directorioArchivosMaestros/T2.tab
@@ -88,8 +88,15 @@ Procesar_Archivo()
 		done
 
 		InterpretarFecha
-
-		MT_REST=$MT_PRES+$MT_IMPAGO+$MT_INDE+$MT_INNODE–$MT_DEB ###esto no esta funcionando, lo que hace no es sumar, si no concatenar
+		InterpretarMontos
+		
+		fecha=$(date +"%Y%m%d")
+		if [ ! -e $directorioProcesados/$fecha ]
+		then
+			mkdir $directorioProcesados/$fecha
+		fi
+		directorioDelDia="$directorioProcesados/$fecha"
+		mv $archivo $directorioDelDia
 
 		###Grabar nuevo archivo: va a tener 16 campos
 		echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> $directorioProcesados/PRESTAMOS.$nombrePais
@@ -175,6 +182,25 @@ InterpretarFecha()
 			CTB_DIA=$(echo $CTB_FE | cut -c7,8)
 		fi
 	fi
+}
+
+InterpretarMontos()
+{
+	###Reemplazo las comas por puntos para poder hacer operaciones
+	MT_PRES=$(echo $MT_PRES | sed s/","/"."/)
+	MT_IMPAGO=$(echo $MT_IMPAGO | sed s/","/"."/)
+	MT_INDE=$(echo $MT_INDE | sed s/","/"."/)
+	MT_INNODE=$(echo $MT_INNODE | sed s/","/"."/)
+	MT_DEB=$(echo $MT_DEB | sed s/","/"."/)
+	
+	###Los montos vacíos los reemplazo por 0
+	MT_PRES=$(echo $MT_PRES | sed s/"^$"/"0"/)
+	MT_IMPAGO=$(echo $MT_IMPAGO | sed s/"^$"/"0"/)
+	MT_INDE=$(echo $MT_INDE | sed s/"^$"/"0"/)
+	MT_INNODE=$(echo $MT_INNODE | sed s/"^$"/"0"/)
+	MT_DEB=$(echo $MT_DEB | sed s/"^$"/"0"/)
+
+	MT_REST=$(echo "$MT_PRES+$MT_IMPAGO+$MT_INDE+$MT_INNODE-$MT_DEB" | bc -l)
 }
 
 ValidarSiYaFueProcesadoElArchivo()
