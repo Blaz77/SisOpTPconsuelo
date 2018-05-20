@@ -1,3 +1,9 @@
 HIPOTESIS:
 
 Solo se reciben archivos y no carpetas.
+
+El tiempo que duerme el demonio son 60 segundos.
+
+EL archivos duplicados no se procesan.
+
+No consideramos case sensitive
