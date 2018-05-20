@@ -43,19 +43,39 @@ EvaluarArchivos()
 
 	for archivo in $archivosAProcesar
 	do
-	 echo "FILE: $archivo"
-	 pais=$(echo $archivo | cut -c 1)
-	 echo "Pais: $pais"
-	 sistema=$(echo $archivo | cut -c 3)
-	 echo "Sistema: $sistema"
+		ValidarSiYaFueProcesadoElArchivo $archivo
+		if [ $ElArchivoEsValido = true ]
+		then
 
-	 regex=$(grep $pais-$sistema $archivoT1)
-	echo "regex $regex"
-	 delimitador_campos=$(echo $regex | cut -c 5)
-	 echo "Delimitador campos: $delimitador_campos"
-	 delimitador_decimal=$(echo $regex | cut -c 7)
-	 echo "Delimitador decimal: $delimitador_decimal"
+			echo "FILE: $archivo"
+	 	  pais=$(echo $archivo | cut -c 1)
+	 	  echo "Pais: $pais"
+	 	  sistema=$(echo $archivo | cut -c 3)
+	 	  echo "Sistema: $sistema"
+
+	 	 regex=$(grep $pais-$sistema $archivoT1)
+	 	 echo "regex $regex"
+	 	 delimitador_campos=$(echo $regex | cut -c 5)
+	 	 echo "Delimitador campos: $delimitador_campos"
+	 	 delimitador_decimal=$(echo $regex | cut -c 7)
+	 	 echo "Delimitador decimal: $delimitador_decimal"
+	 else
+		 echo "El archivo $archivo ya habia sido procesado."
+	 fi
 	done
+}
+
+ValidarSiYaFueProcesadoElArchivo()
+{
+	fecha=$(date +"%Y%m%d")
+
+	if [ ! -e $directorioProcesados/$fecha/$1 ]
+		then
+			ElArchivoEsValido=true
+		else
+			ElArchivoEsValido=false
+	fi
+
 }
 
 VerificarEstadoInicializacion()
