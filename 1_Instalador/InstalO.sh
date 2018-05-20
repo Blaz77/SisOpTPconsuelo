@@ -1,12 +1,13 @@
 #!/bin/bash
 
 grupo=$HOME/Grupo4
+paqueteOrigen=$grupo/"package"
 valido=false
 archivofConf=$HOME/Grupo4/dirconf/fnoc.conf
 archivoLogInstalacion=$HOME/Grupo4/dirconf/instalo.log
 existenTodosDirectorios=true
 archivofConfEstaSano=true
-source $HOME/SisOpTPconsuelo/Logger.sh
+source ./scripts/Logger.sh
 
 Pedir_Nombres_Directorios()
 {
@@ -18,7 +19,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de ejecutables ($1):"
 		read dirEjecutables
-		Validar_Nombre $dirEjecutables
+		Validar_Nombre "$dirEjecutables"
 	done
 
 	valido=false
@@ -26,7 +27,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de archivos maestros ($2):"
 		read dirMaestros
-		Validar_Nombre $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
@@ -34,7 +35,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de arribo de archivos externos ($3):"
 		read dirExternos
-		Validar_Nombre $dirExternos $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
@@ -42,7 +43,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de novedades aceptadas ($4):"
 		read dirAceptados
-		Validar_Nombre $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
@@ -50,7 +51,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de archivos rechazados ($5):"
 		read dirRechazados
-		Validar_Nombre $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
@@ -58,7 +59,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de archivos procesados ($6):"
 		read dirProcesados
-		Validar_Nombre $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
@@ -66,7 +67,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de reportes ($7):"
 		read dirReportes
-		Validar_Nombre $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirReportes" "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
@@ -74,7 +75,7 @@ Pedir_Nombres_Directorios()
 	do
 		echo "Defina el directorio de logs de auditoría del sistema ($8):"
 		read dirLogs
-		Validar_Nombre $dirLogs $dirReportes $dirProcesados $dirRechazados $dirAceptados $dirExternos $dirMaestros $dirEjecutables
+		Validar_Nombre "$dirLogs" "$dirReportes" "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	Pedir_Confirmacion
@@ -83,32 +84,35 @@ Pedir_Nombres_Directorios()
 ####Validar_Nombre recibe varios parametros: primero el directorio actual y despues los anteriormente ingresados
 Validar_Nombre()
 {
-	if [ $1 = "$directorioVacio" ]
+	if [ "$1" = "$directorioVacio" ]
 	then
 		valido=false
 	elif [ $1 = "dirconf" ]
 	then
 		valido=false
-	else
-		valido=true
-	fi
-
-	####valido que sea diferente a los anteriormente ingresados
-	let	contador=0
-	for i in $@
-	do
-		let contador=contador+1
-		###que $contador sea > que 1 para que no se compare con si mismo
-		if [ $contador \> "1" -a $1 = $i ]
-		then
-			valido=false
-		fi
-	done
-
-	####valido que no exista el uno ya creado con ese nombre
-	if [ -e $grupo/$1 ]
+	elif [ $1 = "package" ]
 	then
 		valido=false
+	else
+		valido=true
+
+	    ####valido que sea diferente a los anteriormente ingresados
+	    let	contador=0
+	    for i in $@
+	    do
+		    let contador=contador+1
+		    ###que $contador sea > que 1 para que no se compare con si mismo
+		    if [ $contador \> "1" -a $1 = $i ]
+		    then
+			    valido=false
+		    fi
+	    done
+
+	    ####valido que no exista el uno ya creado con ese nombre
+	    if [ -e $grupo/$1 ]
+	    then
+		    valido=false
+	    fi
 	fi
 
 	if [ $valido = false ]
@@ -169,20 +173,34 @@ Crear_Directorios()
 Mover_Archivos()
 {
 	rutaMaestros="$grupo/$dirMaestros/"
+    rutaScripts="$grupo/$dirEjecutables/"
 
-	archivoAMover="$grupo/archivostp/T1.tab"
-	mv $archivoAMover $rutaMaestros
+	archivoAMover="$paqueteOrigen/archivostp/T1.tab"
+	cp $archivoAMover $rutaMaestros
 
-	archivoAMover="$grupo/archivostp/T2.tab"
-	mv $archivoAMover $rutaMaestros
+	archivoAMover="$paqueteOrigen/archivostp/T2.tab"
+	cp $archivoAMover $rutaMaestros
 
-	archivoAMover="$grupo/archivostp/p-s.mae"
-	mv $archivoAMover $rutaMaestros
+	archivoAMover="$paqueteOrigen/archivostp/p-s.mae"
+	cp $archivoAMover $rutaMaestros
 
-	archivoAMover="$grupo/archivostp/PPI.mae"
-	mv $archivoAMover $rutaMaestros
+	archivoAMover="$paqueteOrigen/archivostp/PPI.mae"
+	cp $archivoAMover $rutaMaestros
 
-	####los otros archivos hay que moverlos tambien????
+	archivoAMover="$paqueteOrigen/scripts/IniciO.sh"
+	cp $archivoAMover $rutaScripts
+
+	archivoAMover="$paqueteOrigen/scripts/DetectO.sh"
+	cp $archivoAMover $rutaScripts
+
+	archivoAMover="$paqueteOrigen/scripts/StopO.sh"
+	cp $archivoAMover $rutaScripts
+
+	archivoAMover="$paqueteOrigen/scripts/InterpretO.sh"
+	cp $archivoAMover $rutaScripts
+
+	archivoAMover="$paqueteOrigen/scripts/ReportO.sh"
+	cp $archivoAMover $rutaScripts
 }
 
 Crear_Archivo_Configuracion()
