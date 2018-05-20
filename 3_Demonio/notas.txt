@@ -1,0 +1,3 @@
+HIPOTESIS:
+
+Solo se reciben archivos y no carpetas.
