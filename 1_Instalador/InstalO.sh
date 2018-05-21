@@ -4,10 +4,10 @@ grupo=$HOME/Grupo4
 paqueteOrigen=$grupo/"package"
 valido=false
 archivofConf=$HOME/Grupo4/dirconf/fnoc.conf
-archivoLogInstalacion=$HOME/Grupo4/dirconf/instalo.log
+archivoLogInstalacion=$HOME/Grupo4/dirconf/InstalO.log
 existenTodosDirectorios=true
 archivofConfEstaSano=true
-source ./scripts/Logger.sh
+source $paqueteOrigen/scripts/Logger.sh
 
 Pedir_Nombres_Directorios()
 {
@@ -186,6 +186,9 @@ Mover_Archivos()
 
 	archivoAMover="$paqueteOrigen/archivostp/PPI.mae"
 	cp $archivoAMover $rutaMaestros
+
+	archivoAMover="$paqueteOrigen/scripts/Logger.sh"
+	cp $archivoAMover $rutaScripts
 
 	archivoAMover="$paqueteOrigen/scripts/IniciO.sh"
 	cp $archivoAMover $rutaScripts
