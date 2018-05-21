@@ -24,7 +24,7 @@
 Iniciar_interprete()
 {
 	# [REPLACE] InterpreteO
-	/home/jleyes/InterpreteMock.sh &
+	$PATH_INTERPRETE &
 
 	# $! guarda el PID del proceso en background
 	pid_Interprete=$!	
@@ -187,6 +187,7 @@ Verifico_inicializacion
 DIRECTORIO_ARRIBOS=/home/jleyes/ARRIBOS
 DIRECTORIO_ACEPTADOS=/home/jleyes/Aceptados
 DIRECTORIO_RECHAZADOS=/home/jleyes/Rechazados
+PATH_INTERPRETE=/home/jleyes/InterpreteMock.sh
 
 numero_ciclo=1
 
@@ -200,9 +201,6 @@ do
 	# Recorro los nombres de los archivos en el directorio de arribos
 	for nombre_archivo in $(cd $DIRECTORIO_ARRIBOS && ls)
 	do
-		# [DEBUG]: Borrar
-	    # echo $nombre_archivo
-
 	    Verificar_archivo_recibido $nombre_archivo	
 
 	    # Guardo el resultado del analisis del archivo
@@ -210,9 +208,6 @@ do
 
     	if [ $archivo_valido == 1 ]
 		then
-			# [DEBUG]: Borrar
-    		# echo "Es valido: $archivo_valido"
-
 			Mover_archivo $DIRECTORIO_ARRIBOS $DIRECTORIO_ACEPTADOS $nombre_archivo
     	fi
 
