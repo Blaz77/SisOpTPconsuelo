@@ -111,7 +111,7 @@ Verificar_archivo_recibido()
 
 Verifico_inicializacion()
 {
-	if [ $INIT_OK == false ]
+	if [ ! $exINIT_OK ]
 	then
 		# [LOG]: El sistema no esta correctamente inicializado
 		echo "El sistema no esta correctamente inicializado."
@@ -125,16 +125,13 @@ Verifico_inicializacion()
 
 ######################################################### Detector de novedades #########################################################
 
-# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
-INIT_OK=true
-
 Verifico_inicializacion
 
 # Seteo variables de ambiente
-# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
-DIRECTORIO_ARRIBOS=/home/jleyes/ARRIBOS
-DIRECTORIO_ACEPTADOS=/home/jleyes/Aceptados
-DIRECTORIO_RECHAZADOS=/home/jleyes/Rechazados
+grupo=$HOME/Grupo4
+DIRECTORIO_ARRIBOS=$grupo/$exDIR_EXT
+DIRECTORIO_ACEPTADOS=$grupo/$exDIR_ACCEPT
+DIRECTORIO_RECHAZADOS=$grupo/$exDIR_REFUSE
 
 numero_ciclo=1
 

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 grupo=$HOME/Grupo4
-source $HOME/SisOpTPconsuelo/Logger.sh
+source ./Logger.sh
 
 #Estas variables deberian venir seteadas desde InicializO.sh
-directorioAceptados=$HOME/Grupo4/acep
-directorioArchivosMaestros=$HOME/Grupo4/mae
-directorioProcesados=$HOME/Grupo4/proc
+directorioAceptados=$grupo/$exDIR_ACCEPT
+directorioArchivosMaestros=$grupo/$exDIR_MASTER
+directorioProcesados=$grupo/$exDIR_PROCESS
 
-directorioLogs=$HOME/Grupo4/logs
-archivoLogInterprete=$HOME/Grupo4/logs/InterpretO.log
+directorioLogs=$grupo/$exDIR_LOGS
+archivoLogInterprete=$directorioLogs/InterpretO.log
 
 archivoT1=$directorioArchivosMaestros/T1.tab
 archivoT2=$directorioArchivosMaestros/T2.tab
@@ -254,10 +254,7 @@ VerificarEstadoInicializacion()
 	FueBienInicializado=true;
 }
 
-#Simulo que la variable esta inicializada para hacer pruebas
-#Esta variable es recibida desde InicializO.sh
-INIT_OK="1"
-if [ $INIT_OK ]
+if [ $exINIT_OK ]
 then
 	VerificarEstadoInicializacion
 	if [ $FueBienInicializado = true ]
