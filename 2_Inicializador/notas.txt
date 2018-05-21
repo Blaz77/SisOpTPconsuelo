@@ -1,0 +1,17 @@
+Variables de ambiente:
+	exDIR_EXEC
+	exDIR_MASTER
+	exDIR_EXT
+	exDIR_ACCEPT
+	exDIR_REFUSE
+	exDIR_PROCESS
+	exDIR_REPORTS
+	exDIR_LOGS
+	exINIT_OK
+
+Loggea en dirconf/IniciO.log
+
+Genera archivo pidRecord.dat para guardar el PID del demonio
+
+Inicia el demonio
+Pregunta e inicia reportes

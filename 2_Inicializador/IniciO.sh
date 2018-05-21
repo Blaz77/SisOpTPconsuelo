@@ -1,8 +1,10 @@
 #!/bin/bash
 
+source ./Logger.sh
 grupo=$HOME/Grupo4
-configFile=../dirconf/fnoc.conf
-pidRecordFile=
+configFile="../dirconf/fnoc.conf"
+pidRecordFile="./pidRecord.dat"
+logFile="../dirconf/IniciO.log"
 
 bin_Instalador=InstalO.sh
 bin_Inicializador=IniciO.sh
@@ -11,33 +13,42 @@ bin_Killer=StopO.sh
 bin_Interprete=InterpretO.sh
 bin_Reportes=ReportO.sh
 
-mae_Files="P-S.mae PPI.mae"
+mae_Files="p-s.mae PPI.mae"
 table_Files="T1.tab T2.tab"
 
+# Params: string mensajeEspecifico, string funcionOrigen
 Error_Fatal()
 {
-	# LOGW5 $1 $2 $3 $4 $5
-	echo "Imposible inicializar " # Y bla bla
+	error="Imposible inicializar el sistema: $1"
+	LogearMensaje "IniciO" "ERR" "$error" "$logFile"
+	echo "$error"
 	exit
+}
+
+# Params: string mensajeEspecifico, string funcionOrigen
+Log_Info()
+{
+	LogearMensaje "IniciO" "INF" "$1" "$logFile"
+	echo "$1"
 }
 
 Leer_Config()
 {
-	exDIR_EXEC=grep '^Ejecutables.*' $configFile | cut -f2 -d'-'
-	exDIR_MASTER=grep '^Maestros.*' $configFile | cut -f2 -d'-'
+	exDIR_EXEC=$(grep '^Ejecutables.*' $configFile | cut -f2 -d'-')
+	exDIR_MASTER=$(grep '^Maestros.*' $configFile | cut -f2 -d'-')
 	# TODO : Cambiar por Arribos
-	exDIR_EXT=grep '^Externos.*' $configFile | cut -f2 -d'-'
-	exDIR_ACCEPT=grep '^Aceptados.*' $configFile | cut -f2 -d'-'
-	exDIR_REFUSE=grep '^Rechazados.*' $configFile | cut -f2 -d'-'
-	exDIR_PROCESS=grep '^Procesados.*' $configFile | cut -f2 -d'-'
-	exDIR_REPORTS=grep '^Reportes.*' $configFile | cut -f2 -d'-'
-	exDIR_LOGS=grep '^Logs.*' $configFile | cut -f2 -d'-'
+	exDIR_EXT=$(grep '^Externos.*' $configFile | cut -f2 -d'-')
+	exDIR_ACCEPT=$(grep '^Aceptados.*' $configFile | cut -f2 -d'-')
+	exDIR_REFUSE=$(grep '^Rechazados.*' $configFile | cut -f2 -d'-')
+	exDIR_PROCESS=$(grep '^Procesados.*' $configFile | cut -f2 -d'-')
+	exDIR_REPORTS=$(grep '^Reportes.*' $configFile | cut -f2 -d'-')
+	exDIR_LOGS=$(grep '^Logs.*' $configFile | cut -f2 -d'-')
 	
 	for i in "$exDIR_EXEC" "$exDIR_MASTER" "$exDIR_EXT" "$exDIR_ACCEPT" "$exDIR_REFUSE" "$exDIR_PROCESS" "$exDIR_REPORTS" "$exDIR_LOGS"
 	do
 		if [ $i == "" ]
 		then
-			Error_Fatal 1 2 3 4 5
+			Error_Fatal "Archivo de configuracion dañado" "Leer_config"
 		fi
 	done
 	
@@ -48,7 +59,7 @@ Verificar_Directorio() # Params: string dirName
 {
 	if [ ! -d $grupo/$1 ] # Existe directorio
 	then
-		Error_Fatal $1 2 3 4 5
+		Error_Fatal "No se encuentra el directorio $1" "Verificar_Directorio"
 	fi
 }
 
@@ -69,13 +80,13 @@ Verificar_Archivo() # Params: string dirName, string scriptName
 {
 	if [ ! -f $grupo/$1/$2 ] # Existe archivo
 	then
-		Error_Fatal $2 2 3 4 5
+		Error_Fatal "No se encuentra el archivo $2" "Verificar_Archivo"
 	fi
 }
 
 Verificar_Archivos()
 {
-	for i in "$bin_Instalador" "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
+	for i in "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
 	do
 		Verificar_Archivo $exDIR_EXEC $i
 	done
@@ -96,11 +107,9 @@ Verificar_Permiso_Lectura() # Params: string dirName, string fileName
 	if [ ! -r $grupo/$1/$2 ]
 	then
 		chmod +r $grupo/$1/$2
-		# LOGW5
-		echo "Se agrega permiso de lectura para el archivo $2."
+		Log_Info "Se agrega permiso de lectura para el archivo $2." "Verificar_Permiso_Lectura"
 	else
-		# LOGW5
-		echo "$2: Permiso de lectura OK."
+		Log_Info "$2: Permiso de lectura OK." "Verificar_Permiso_Lectura"
 	fi
 }
 
@@ -109,18 +118,16 @@ Verificar_Permiso_Ejecucion() # Params: string dirName, string fileName
 	if [ ! -x $grupo/$1/$2 ]
 	then
 		chmod +x $grupo/$1/$2
-		# LOGW5
-		echo "Se agrega permiso de ejecucioon para el archivo $2."
+		Log_Info "Se agrega permiso de ejecucioon para el archivo $2." "Verificar_Permiso_Ejecucion"
 	else
-		# LOGW5
-		echo "$2: Permiso de ejecucioon OK."
+		Log_Info "$2: Permiso de ejecucioon OK." "Verificar_Permiso_Ejecucion"
 	fi
 }
 
 # Verificar y corregir permisos de archivos maestros y ejecutables
 Verificar_Permisos()
 {
-	for i in "$bin_Instalador" "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
+	for i in "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
 	do
 		Verificar_Permiso_Ejecucion $exDIR_EXEC $i
 	done
@@ -148,7 +155,7 @@ Setear_ambiente()
 	export exDIR_REPORTS
 	export exDIR_LOGS
 	export exINIT_OK
-}ç
+}
 
 # Verifica demonio corriendo, si es afirmativo, muestra y loguea el PID
 Verificar_Demonio()
@@ -157,15 +164,11 @@ Verificar_Demonio()
 	then
 		local PID=
 		read -r PID < $grupo/$exDIR_EXEC/$pidRecordFile
-		if [[ "$PID" =~ "^[0-9]+$" ]] # Solo numeros
-        then
-			local PID_PS = ps -eo pid,args | grep ".*$PID.*$bin_Demonio$" | cut -f1 -d' '
-			if [ $PID == $PID_PS ]
-			then
-				tmp_Retorno=$PID
-				# LOGW5
-				echo "Detector de novedades ya iniciado. No se volvera a ejecutar."
-			fi
+		local PID_PS=$(ps -fo pid,args -p $PID | grep ".*$PID./$bin_Inicializador$" | cut -f1 -d' ')
+		if [ "$PID" == "$PID_PS" -a "$PID_PS" != "" ]
+		then
+			tmp_Retorno=$PID
+			Log_Info "Detector de novedades ya iniciado. No se volvera a ejecutar." "Verificar_Demonio"
 		fi
 	fi
 }
@@ -175,19 +178,19 @@ Iniciar_Demonio()
 {
 	$grupo/$exDIR_EXEC/$bin_Demonio &
 	demonio_PID=$!
-	# LOGW5
-	echo "Se inicia el detector de novedades en el proceso:" $demonio_PID
+	echo "$demonio_PID" > "$pidRecordFile"
+	Log_Info "Se inicia el detector de novedades en el proceso: $demonio_PID" "Iniciar_Demonio"
 }
 
 # Preguntar e iniciar el modulo de reportes
 Iniciar_Reportes()
 {
-	while [ $ch_IniciarReportes != "n" -a $ch_IniciarReportes != "s" ]
+	while [ "$ch_IniciarReportes" != "n"  -a "$ch_IniciarReportes" != "s" ]
 	do
 		read -r -e -n 1 -p "Desea iniciar el modulo de reportes? (s/n): " ch_IniciarReportes
 	done
 	
-	if [ $ch_IniciarReportes == "s" ]
+	if [ "$ch_IniciarReportes" == "s" ]
 	then
 		$grupo/$exDIR_EXEC/$bin_Reportes
 	fi
@@ -201,9 +204,10 @@ Setear_ambiente
 
 tmp_Retorno=
 Verificar_Demonio
-if [ tmp_Retorno == "" ]
+if [ "$tmp_Retorno" == "" ]
 then
 	Iniciar_Demonio
 fi
 
+sleep 1
 Iniciar_Reportes

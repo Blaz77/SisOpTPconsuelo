@@ -13,9 +13,9 @@
 
 ######################################################### Funciones auxiliares #########################################################
 
-# grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}\.txt$'
+# grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}$'
 # grep -c -v '^$'
-# ls | grep -c -i A-8-2018-04.txt
+# ls | grep -c -i A-8-2018-04
 # ls | grep -c duplicados
 # date +%Y-%m-%d_%H:%M:%S
 
@@ -90,13 +90,13 @@ Mover_archivo()
 Verificar_archivo_recibido()
 {
 	# Verifico formato del nombre de archivo y su extension
-	nombre_valido=$(echo $1 | grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}\.txt$')
+	nombre_valido=$(echo $1 | grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}$')
 
 	# Verifico contenido archivo que no este vacio
 	# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
 	esta_vacio=$(grep -c '^$' $DIRECTORIO_ARRIBOS/$1)
 
-	if [ $nombre_valido != 1 ] || [ $esta_vacio == 1 ] 
+	if [ $nombre_valido != 1 ] || [ $esta_vacio == 1 ] || [ ! -f $DIRECTORIO_ARRIBOS/$1 ]
 	then
 		# [DEBUG]
 		echo "Archivo invalido"
@@ -142,8 +142,8 @@ while true
 do
 	# registro el numero de ciclo [LOG]
 
-	# Recorro los nombres de los archivos en el directorio de arribos y filtro por extension .txt
-	for nombre_archivo in $(cd $DIRECTORIO_ARRIBOS && ls *.txt)
+	# Recorro los nombres de los archivos en el directorio de arribos
+	for nombre_archivo in $(cd $DIRECTORIO_ARRIBOS && ls)
 	do
 		# [DEBUG]: Borrar
 	    # echo $nombre_archivo
