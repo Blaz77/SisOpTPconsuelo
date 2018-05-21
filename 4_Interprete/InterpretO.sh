@@ -8,7 +8,7 @@ directorioAceptados=$HOME/Grupo4/acep
 directorioArchivosMaestros=$HOME/Grupo4/mae
 directorioProcesados=$HOME/Grupo4/proc
 
-directorioLogs=$HOME/Grupo4/losg
+directorioLogs=$HOME/Grupo4/logs
 archivoLogInterprete=$HOME/Grupo4/logs/InterpretO.log
 
 archivoT1=$directorioArchivosMaestros/T1.tab
@@ -21,7 +21,7 @@ Procesar()
 	#Fijate que a directorioAceptados ponele el nombre que vos le pusiste al crearlo
 	#Esa variable nos la tiene que dar InicializO.sh
 	LogearMensaje ${FUNCNAME[0]} "INF" "Procesando archivos" $archivoLogInterprete
-	if [ -e $directorioAceptados ]
+	if [ -e $directorioAceptados/* ]
 		then
 			EvaluarArchivos
 	else
@@ -32,30 +32,16 @@ Procesar()
 EvaluarArchivos()
 {
 	#Busco todos los archivos a procesar
-	cd
-	cd $directorioAceptados
-	archivosAProcesar=$(ls)
-
-	# while ( cd $directorioAceptados && ls -1 )
-	# do
-	# 	files=( directorioAceptados/* )
-	# 	echo "${files[0]}"
-	# 	#archivoAMover= ( cd $directorioAceptados | ls | head -1 )
-	#
-	# 	#archivoAMover="$directorioAceptados/$archivo"
-	# 	mv ${files[0]} $directorioProcesados
-	#
-	# done
-
-	for archivo in $archivosAProcesar
+	for archivo in $(cd $directorioAceptados && ls)
 	do
 		ValidarSiYaFueProcesadoElArchivo $archivo
 		if [ $ElArchivoEsValido = true ]
 		then
 			Procesar_Archivo
 			Mover_Archivo
+			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo procesado: $archivo $logParaRegistroDeArchivo." $archivoLogInterprete
 	 	else
-			echo "El archivo $archivo ya había sido procesado."
+			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo rechazado: $archivo. Ya había sido procesado durante el dia." $archivoLogInterprete
 	 	fi
 	done
 }
@@ -78,9 +64,12 @@ Procesar_Archivo()
 	delimitador_decimal=$(echo $regex | cut -c7)
 
 	cantidadCampos=$(grep -c "$pais-$sistema" $archivoT2)
+	logParaRegistroDeArchivo=""
+	let contadorDeRegistro=0
 	###No se por que el while no lee la ultima linea del archivo
 	while read -r linea
 	do
+		let contadorDeRegistro=contadorDeRegistro+1
 		ResetearCampos
 		let contador=1
 		while [ $contador -le $cantidadCampos ]
@@ -93,7 +82,7 @@ Procesar_Archivo()
 		InterpretarMontos
 		GrabarArchivo
 
-	done < $archivo
+	done < $directorioAceptados/$archivo
 }
 
 ResetearCampos()
@@ -200,7 +189,7 @@ InterpretarMontos()
 	MT_INDE=$(echo $MT_INDE | sed s/","/"."/)
 	MT_INNODE=$(echo $MT_INNODE | sed s/","/"."/)
 	MT_DEB=$(echo $MT_DEB | sed s/","/"."/)
-	
+
 	###Los montos vacíos los reemplazo por 0
 	MT_PRES=$(echo $MT_PRES | sed s/"^$"/"0"/)
 	MT_IMPAGO=$(echo $MT_IMPAGO | sed s/"^$"/"0"/)
@@ -231,6 +220,7 @@ GrabarArchivo()
 
 	###Grabar nuevo archivo: va a tener 16 campos
 	echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> $directorioProcesados/PRESTAMOS.$nombrePais
+	logParaRegistroDeArchivo="$logParaRegistroDeArchivo Registro $contadorDeRegistro aceptado "
 }
 
 Mover_Archivo()
@@ -242,13 +232,12 @@ Mover_Archivo()
 		mkdir $directorioProcesados/$fecha
 	fi
 	directorioDelDia="$directorioProcesados/$fecha"
-	mv $archivo $directorioDelDia
+	mv $directorioAceptados/$archivo $directorioDelDia
 }
 
 ValidarSiYaFueProcesadoElArchivo()
 {
 	fecha=$(date +"%Y%m%d")
-
 	if [ ! -e $directorioProcesados/$fecha/$1 ]
 		then
 			ElArchivoEsValido=true
