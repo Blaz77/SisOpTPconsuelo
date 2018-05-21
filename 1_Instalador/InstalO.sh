@@ -13,11 +13,13 @@ Pedir_Nombres_Directorios()
 {
 	directorioVacio=""
 	echo "Todos sus directorios serán creados en $grupo"
+	LogearMensaje ${FUNCNAME[0]} "INF" "Indicando ruta donde se crearan los directorios $grupo" $archivoLogInstalacion
 
 	valido=false
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de ejecutables ($1):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de ejecutables" $archivoLogInstalacion
 		read dirEjecutables
 		Validar_Nombre "$dirEjecutables"
 	done
@@ -26,6 +28,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de archivos maestros ($2):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos maestros" $archivoLogInstalacion
 		read dirMaestros
 		Validar_Nombre "$dirMaestros" "$dirEjecutables"
 	done
@@ -34,6 +37,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de arribo de archivos externos ($3):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos externos" $archivoLogInstalacion
 		read dirExternos
 		Validar_Nombre "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
@@ -42,6 +46,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de novedades aceptadas ($4):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de novedades aceptadas" $archivoLogInstalacion
 		read dirAceptados
 		Validar_Nombre "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
@@ -50,6 +55,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de archivos rechazados ($5):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos rechazados" $archivoLogInstalacion
 		read dirRechazados
 		Validar_Nombre "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
@@ -58,6 +64,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de archivos procesados ($6):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos procesados" $archivoLogInstalacion
 		read dirProcesados
 		Validar_Nombre "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
@@ -66,6 +73,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de reportes ($7):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de reportes" $archivoLogInstalacion
 		read dirReportes
 		Validar_Nombre "$dirReportes" "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
@@ -74,6 +82,7 @@ Pedir_Nombres_Directorios()
 	while [ $valido = false ]
 	do
 		echo "Defina el directorio de logs de auditoría del sistema ($8):"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de logs de auditoría del sistema" $archivoLogInstalacion
 		read dirLogs
 		Validar_Nombre "$dirLogs" "$dirReportes" "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
@@ -87,12 +96,15 @@ Validar_Nombre()
 	if [ "$1" = "$directorioVacio" ]
 	then
 		valido=false
+		LogearMensaje ${FUNCNAME[0]} "ALE" "Define el nombre de directorio vacio" $archivoLogInstalacion
 	elif [ $1 = "dirconf" ]
 	then
 		valido=false
+		LogearMensaje ${FUNCNAME[0]} "ERR" "Define el nombre de directorio directorio como dirconf y eso es invalido" $archivoLogInstalacion
 	elif [ $1 = "package" ]
 	then
 		valido=false
+		LogearMensaje ${FUNCNAME[0]} "ERR" "Define el nombre de directorio directorio como package y eso es invalido" $archivoLogInstalacion
 	else
 		valido=true
 
@@ -118,6 +130,7 @@ Validar_Nombre()
 	if [ $valido = false ]
 	then
 		echo "Nombre de directorio inválido."
+		LogearMensaje ${FUNCNAME[0]} "ERR" "El nombre de directorio ingresado ya habia sido existe." $archivoLogInstalacion
 	fi
 }
 
@@ -140,16 +153,19 @@ Estado de la instalación: LISTA
 	while [ $confirmaInstalacion != "NO" -a $confirmaInstalacion != "SI" ]
 	do
 		echo "Ingrese SI o NO"
+		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de confirmacion de directorios." $archivoLogInstalacion
 		read confirmaInstalacion
 	done
 
 	if [ $confirmaInstalacion = "NO" ]
 	then
 		echo "Vuelva a ingresar los nombres de los directorios"
+		LogearMensaje ${FUNCNAME[0]} "INF" "El usuario no confirma los directorios.Se procede a pedir el ingreso nuevamente." $archivoLogInstalacion
 		Pedir_Nombres_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	elif [ $confirmaInstalacion = "SI" ]
 		then
-		Crear_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
+			LogearMensaje ${FUNCNAME[0]} "INF" "El usuario confirma los directorios." $archivoLogInstalacion
+		  Crear_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
 	fi
 }
 
@@ -164,6 +180,7 @@ Crear_Directorios()
 	mkdir $grupo/$7
 	mkdir $grupo/$8
 	echo "Directorios creados exitosamente"
+	LogearMensaje ${FUNCNAME[0]} "INF" "Se crearon los directorios exitosamente." $archivoLogInstalacion
 
 	Mover_Archivos
 	Crear_Archivo_Configuracion
@@ -201,6 +218,8 @@ Mover_Archivos()
 
 	archivoAMover="$paqueteOrigen/scripts/ReportO.sh"
 	cp $archivoAMover $rutaScripts
+
+	LogearMensaje ${FUNCNAME[0]} "INF" "Se movieron los archivos del paquete de origen a las rutas establecidas por el usuario." $archivoLogInstalacion
 }
 
 Crear_Archivo_Configuracion()
@@ -217,11 +236,12 @@ Crear_Archivo_Configuracion()
 	echo "Procesados-$dirProcesados-$USER-$fecha" >> $archivofConf
 	echo "Reportes-$dirReportes-$USER-$fecha" >> $archivofConf
 	echo "Logs-$dirLogs-$USER-$fecha" >> $archivofConf
+	LogearMensaje ${FUNCNAME[0]} "INF" "Se crea el archivo de configuración con las rutas establecidas por el usuario." $archivoLogInstalacion
 }
 
 Crear_Log_Instalacion()
 {
-	LogearMensaje ${FUNCNAME[0]} "INF" "Creando log de instalacion" $archivoLogInstalacion
+	LogearMensaje ${FUNCNAME[0]} "INF" "Instalacion finalizada." $archivoLogInstalacion
 }
 
 Ejecutar_Instalador_Con_Parametros()
@@ -237,12 +257,15 @@ Ejecutar_Instalador_Con_Parametros()
 					Reparar
 			else
 				echo "El archivo de configuración está dañado. Imposible reparar."
+				LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita realizar la reparacion pero el archivo de configuracion esta dañado. Imposible reparar." $archivoLogInstalacion
 			fi
 		else
 			echo "El archivo de configuración no existe. Vuelva a instalar."
+			LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita realizar la reparacion pero no existe el archivo de configuracion." $archivoLogInstalacion
 		fi
 	else
 		echo "No es una línea de comando válida."
+		LogearMensaje ${FUNCNAME[0]} "ERR" "Ingreso de linea de comando invalida." $archivoLogInstalacion
 	fi
 }
 
@@ -255,6 +278,7 @@ Mostrar_Datos_Instalacion()
 		directorioElegido=$(echo $linea | cut -d '-' -f2)
 		echo "$archivosTipo en el directorio: $grupo/$directorioElegido"
 	done < $archivofConf
+	LogearMensaje ${FUNCNAME[0]} "INF" "Mostrando datos de instalacion." $archivoLogInstalacion
 }
 
 Existen_Todos_Directorios()
@@ -281,12 +305,14 @@ Reparar()
 		fi
 	done < $archivofConf
 
+	LogearMensaje ${FUNCNAME[0]} "INF" "Instalación reparada exitosamente." $archivoLogInstalacion
 	echo "Instalación reparada exitosamente."
 }
 
 Modulo_Reparacion()
 {
 	echo "La instalación está incompleta. ¿Desea repararla? (SI-NO):"
+	LogearMensaje ${FUNCNAME[0]} "INF" "La instalacion ya habia sido realizada, por ende se le solicita al usuario si desde repararla." $archivoLogInstalacion
 	read reparar
 	while [ $reparar != "NO" -a $reparar != "SI" ]
 	do
@@ -296,8 +322,10 @@ Modulo_Reparacion()
 
 	if [ $reparar = "SI" ]
 	then
+		LogearMensaje ${FUNCNAME[0]} "INF" "El usuario solicita la reparacion." $archivoLogInstalacion
 		Reparar
 	else
+		LogearMensaje ${FUNCNAME[0]} "INF" "El usuario no desea realizar la reparacion." $archivoLogInstalacion
 		exit
 	fi
 }
@@ -347,8 +375,10 @@ Instalacion()
 			fi
 		else
 			echo "El archivo de configuración está dañado. Imposible continuar."
+			LogearMensaje ${FUNCNAME[0]} "ALE" "El archivo de configuración está dañado. Imposible continuar." $archivoLogInstalacion
 		fi
 	else
+		LogearMensaje ${FUNCNAME[0]} "INF" "Ejecutando instalacion" $archivoLogInstalacion
 		Pedir_Nombres_Directorios "ejec" "mae" "ext" "acep" "rech" "proc" "rep" "logs"
 	fi
 }
