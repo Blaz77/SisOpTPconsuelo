@@ -21,7 +21,7 @@ echo "Eliminando paquete anterior..."
 
 rm -rf $DIFERENCIAL/$DIR_PAQUETE
 
-echo "Creando directorios"
+echo "Creando directorios..."
 
 mkdir $DIFERENCIAL/$DIR_PAQUETE
 mkdir $DIFERENCIAL/$DIR_PAQUETE/Grupo4

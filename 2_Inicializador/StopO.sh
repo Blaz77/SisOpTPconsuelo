@@ -14,9 +14,10 @@ if [ -f $pidRecordFile ]
 then
 	PID=
 	read -r PID < $pidRecordFile
-	PID_PS=$(ps -fo pid,args -p $PID | grep ".*$PID./$bin_Inicializador$" | cut -f1 -d' ')
+	PID_PS=$(ps -fo pid,args -p $PID | grep ".*$PID.*Grupo4.*\.sh$" | cut -f1 -d' ')
 	if [ "$PID" == "$PID_PS" -a "$PID_PS" != "" ]
 	then
 		Log_Info "Se detiene el detector de novedades." ""
+        kill -9 $PID
 	fi
 fi
