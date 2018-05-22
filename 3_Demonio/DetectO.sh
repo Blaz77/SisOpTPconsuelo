@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # Se ejecuta en background . ./DetectO.sh &
-
-# Cambiar llamadas al logger [LOG]
-# Poner mensajes en [LOG]
-# Nombre DetecO.log
+# Nombre log DetecO.log
 
 ######################################################### Funciones auxiliares #########################################################
 
@@ -22,53 +19,62 @@ Iniciar_interprete()
 
 	# $! guarda el PID del proceso en background
 	pid_Interprete=$!	
+
+	# [DEBUG]
+	echo "Validador invocado: process id $pid_Interprete"
+
+	Log_Info "Iniciar_interprete" "Validador invocado: process id $pid_Interprete"
 }
 
 # Invoca al interprete si hay archivos en la carpeta aceptados y si no se encuentra en ejecucion
 Validar_estado_interprete()
 {
 	# [DEBUG]
-	echo "debug: analizando estado del interprete"	
+	echo "Analizando estado del interprete"	
 
 	cantidad_archivos_aceptados=$(ls $DIRECTORIO_ACEPTADOS | wc -l)
 
 	if [ $cantidad_archivos_aceptados != 0 ]
 	then
 
-		# [LOG]
 		# [DEBUG]
 		echo "Hay archivos para ejecutar el interprete"
 
+		Log_Info "Validar_estado_interprete" "Hay archivos para ejecutar el interprete"
+
 		if [ $interprete_iniciado == false ]
 		then
+
 			Iniciar_interprete		
 
 			interprete_iniciado=true
 
-			# [DEBUG]
-			echo "PID: $pid_Interprete"
 		else
+
 			interprete_sigue_corriendo=$(ps -p $pid_Interprete | wc -l)	
 
 			# interprete_sigue_corriendo == 1, no se encuentra en ejecucion
 			if [ $interprete_sigue_corriendo == 1 ]
 			then
+
 				Iniciar_interprete
 
-				# [LOG]
-				echo "PID: $pid_Interprete"
 			else
-				# [LOG]
-				echo "El interprete se esta ejecutando, queda para el siguiente ciclo"
+
+				# [DEBUG]
+				echo "Invocacion del validador pospuesta para el siguiente ciclo"
+
+				Log_Info "Validar_estado_interprete" "Invocacion del validador pospuesta para el siguiente ciclo"
 			fi
 		fi
 
 		return 
 	fi
 
-	# [LOG]
 	# [DEBUG]
 	echo "No hay archivos para ejecutar el interprete"		
+
+	Log_Info "Validar_estado_interprete" "No hay archivos para ejecutar el interprete"
 }
 
 # Mover_archivo() DIRECTORIO_ORIGEN DIRECTORIO_DESTINO NOMBRE_ARCHIVO
@@ -93,11 +99,12 @@ Mover_archivo()
 		if [ $existe_carpeta_duplicados == 0 ]
 		then
 
-			# [LOG] se crea carpeta de duplicados
-			mkdir $2/duplicados
-
 			# [DEBUG]
-			echo "Creo carpeta duplicados"
+			echo "Se crea carpeta de duplicados"
+
+			Log_Info "Mover_archivo" "Se crea carpeta de duplicados"
+
+			mkdir $2/duplicados
 		fi
 
 		fecha_duplicado=$(date +%Y-%m-%d_%H:%M:%S)
@@ -106,11 +113,18 @@ Mover_archivo()
 		# echo "Fecha archivo duplicado: $fecha_duplicado"
 
 		mv $1/$3 $2/duplicados/$3_$fecha_duplicado
-		# [LOG] archivo aceptado duplicado: $3_$fecha_duplicado
+
+		# [DEBUG]
+		echo "Muevo novedad duplicada: $3"
+
+		Log_Info "Mover_archivo" "Muevo archivo duplicado: $3"
 
 	else
+		# [DEBUG] 
+		echo "Muevo novedad aceptada: $3"
 
-		# [LOG] archivo aceptado: $1
+		Log_Info "Mover_archivo" "Muevo novedad aceptada: $3"
+
 		mv $1/$3 $2/$3
 	fi
 }
@@ -123,7 +137,9 @@ Verificar_archivo_recibido()
 	if [ $nombre_valido != 1 ]
 	then
 		# [DEBUG]
-		echo "Archivo invalido"
+		echo "Novedad rechazada: $1, motivo del descarte: formato de nombre invalido."
+
+		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: formato de nombre invalido."
 
 		return 0
 	fi
@@ -134,7 +150,9 @@ Verificar_archivo_recibido()
 	if [ $esta_vacio == 1 ] 
 	then
 		# [DEBUG]
-		echo "Archivo invalido"
+		echo "Novedad rechazada: $1, motivo del descarte: el archivo esta vacio."
+
+		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: el archivo esta vacio."
 
 		return 0
 	fi
@@ -143,7 +161,9 @@ Verificar_archivo_recibido()
 	if [ ! -f $DIRECTORIO_ARRIBOS/$1 ]
 	then
 		# [DEBUG]
-		echo "Archivo invalido"
+		echo "Novedad rechazada: $1, motivo del descarte: no es un archivo regular."
+
+		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: no es un archivo regular."
 
 		return 0
 	fi
@@ -167,7 +187,9 @@ Verificar_archivo_recibido()
 	if [ $pais_sistema_valido == 0 ]
 	then
 		# [DEBUG]
-		echo "Archivo invalido"
+		echo "Novedad rechazada: $1, motivo del descarte: codigo de pais y sistema inexistente."
+
+		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: codigo de pais y sistema inexistente."
 
 		return 0
 	fi
@@ -190,54 +212,72 @@ Verificar_archivo_recibido()
 	if [ $anio -gt $anio_actual ]
 	then
 		# [DEBUG]
-		echo "Año invalido: $anio"
+		echo "Novedad rechazada: $1, motivo del descarte: año adelantado."
 
+		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: año adelantado."
+		
 		return 0
 	fi 
 
 	if [ $anio -eq $anio_actual ] && [ $mes -gt $mes_actual ]
 	then
 		# [DEBUG]
-		echo "Mes invalido: $mes"
+		echo "Novedad rechazada: $1, motivo del descarte: periodo adelantado."
+
+		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: periodo adelantado."
 
 		return 0
 	fi
 
 	# [DEBUG]
-	echo "Archivo valido"
+	echo "Novedad aceptada: $1"
+
+	Log_Info "Verificar_archivo_recibido" "Novedad aceptada: $1"
 
 	return 1
 }
 
 Verifico_inicializacion()
 {
-	if [ $INIT_OK == false ]
+	if [ $exINIT_OK != 1 ]
 	then
-		# [LOG]: El sistema no esta correctamente inicializado
-		echo "El sistema no esta correctamente inicializado."
+		echo "El sistema no esta correctamente inicializado, fin de la ejecucion."
+
+		Log_Error "Verifico_inicializacion" "El sistema no esta correctamente inicializado, fin de la ejecucion."
 		
 		exit 1
 	fi	
 	
-	# [LOG]: El sistema esta correctamente inicializado
 	echo "El sistema esta correctamente inicializado."	
+
+	Log_Info "Verifico_inicializacion" "El sistema esta correctamente inicializado."
+}
+
+# Log_Error() $funcionOrigen $MensajeInfo
+Log_Error()
+{
+	LogearMensaje "$1" "ERR" "$2" "$PATH_LOG"
+}
+
+# Log_Info() $funcionOrigen $MensajeInfo
+Log_Info()
+{
+	LogearMensaje "$1" "INF" "$2" "$PATH_LOG"
 }
 
 ######################################################### Detector de novedades #########################################################
 
-# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
-INIT_OK=true
-
 Verifico_inicializacion
 
 # Seteo variables de ambiente
-grupo=$HOME/Grupo4	
+grupo=$HOME/Grupo4
 DIRECTORIO_ARRIBOS=$grupo/$exDIR_EXT
 DIRECTORIO_ACEPTADOS=$grupo/$exDIR_ACCEPT
 DIRECTORIO_RECHAZADOS=$grupo/$exDIR_REFUSE
 
 PATH_MAESTRO_PAIS_CODIGO=$grupo/$exDIR_MASTER/p-s.mae
 PATH_INTERPRETE=$grupo/$exDIR_EXEC/InterpretO.sh
+PATH_LOG=$grupo/$exDIR_LOGS/DetecO.log
 
 numero_ciclo=1
 
@@ -245,12 +285,12 @@ interprete_iniciado=false
 
 while true
 do
-	# registro el numero de ciclo [LOG]
 	echo "Ciclo: $numero_ciclo"
 	echo "Analizo directorio de archivos recibidos"
 
-	# Recorro los archivos en el directorio de arribos
-	for nombre_archivo in $(cd $DIRECTORIO_ARRIBOS && ls)
+	Log_Info "mainDetectO" "Ciclo numero $numero_ciclo"
+
+	for nombre_archivo in $(ls $DIRECTORIO_ARRIBOS)
 	do
 	    Verificar_archivo_recibido $nombre_archivo	
 
