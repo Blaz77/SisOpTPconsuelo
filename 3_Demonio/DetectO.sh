@@ -6,10 +6,6 @@
 # Poner mensajes en [LOG]
 # Nombre DetecO.log
 
-# Cambiar variables de ambiente [REPLACE]
-
-# Falta verificar periodo actual
-
 ######################################################### Funciones auxiliares #########################################################
 
 # grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}$'
@@ -75,23 +71,6 @@ Validar_estado_interprete()
 	echo "No hay archivos para ejecutar el interprete"		
 }
 
-Mover_archivos_rechazados()
-{
-	echo "debug: Moviendo todos los archivos no aceptados"
-
-	# Recorro los nombres de los archivos en el directorio de arribos no aceptados
-	for archivo_rechazado in $(cd $DIRECTORIO_ARRIBOS && ls)
-	do
-		# [DEBUG]: Borrar
-	    # echo "Moviendo archivo: $archivo_rechazado"
-
-	    # [LOG] archivo rechazado: $archivo_rechazado
-
-	    Mover_archivo $DIRECTORIO_ARRIBOS $DIRECTORIO_RECHAZADOS $archivo_rechazado
-
-	done 
-}
-
 # Mover_archivo() DIRECTORIO_ORIGEN DIRECTORIO_DESTINO NOMBRE_ARCHIVO
 Mover_archivo()
 {
@@ -141,30 +120,85 @@ Verificar_archivo_recibido()
 	# Verifico formato del nombre de archivo
 	nombre_valido=$(echo $1 | grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}$')
 
+	if [ $nombre_valido != 1 ]
+	then
+		# [DEBUG]
+		echo "Archivo invalido"
+
+		return 0
+	fi
+
 	# Verifico contenido archivo que no este vacio
 	esta_vacio=$(grep -c '^$' $DIRECTORIO_ARRIBOS/$1)
 
-	codigo_pais=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.*\)/\1/')
+	if [ $esta_vacio == 1 ] 
+	then
+		# [DEBUG]
+		echo "Archivo invalido"
+
+		return 0
+	fi
+
+	# Verifico que sea un archivo regular
+	if [ ! -f $DIRECTORIO_ARRIBOS/$1 ]
+	then
+		# [DEBUG]
+		echo "Archivo invalido"
+
+		return 0
+	fi
+
+	# Verifico contra archivo maestro pais-sistema
+	codigo_pais=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.\{4\}\)-\(.\{2\}\)/\1/')
 	
 	# [DEBUG]
 	# echo "codigo pais: $codigo_pais"
 
-	codigo_sistema=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.*\)/\2/')
+	codigo_sistema=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.\{4\}\)-\(.\{2\}\)/\2/')
 
 	# [DEBUG]
 	# echo "codigo sistema: $codigo_sistema"
 
-	# Verifico contra archivo maestro pais-sistema
 	pais_sistema_valido=$(grep -i -c "^$codigo_pais-.*-$codigo_sistema-" $PATH_MAESTRO_PAIS_CODIGO)
 
 	# [DEBUG]
-	# echo "Pais-Sistema valido: $pais_sistema_valido" 
+	echo "Pais-Sistema valido: $pais_sistema_valido" 
 
-	# Verificar que el archivo sea regular
-	if [ $nombre_valido != 1 ] || [ $esta_vacio == 1 ] || [ ! -f $DIRECTORIO_ARRIBOS/$1 ] || [ pais_sistema_valido == 0 ]
+	if [ $pais_sistema_valido == 0 ]
 	then
 		# [DEBUG]
 		echo "Archivo invalido"
+
+		return 0
+	fi
+
+	# Verifico que no sea superior al periodo actual
+	anio=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.\{4\}\)-\(.\{2\}\)/\3/')
+	
+	# [DEBUG]
+	# echo "Anio: $anio"
+
+	mes=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.\{4\}\)-\(.\{2\}\)/\4/')
+
+	# [DEBUG]
+	# echo "Mes: $mes"
+
+	anio_actual=$(date +%Y)
+
+	mes_actual=$(date +%m)
+
+	if [ $anio -gt $anio_actual ]
+	then
+		# [DEBUG]
+		echo "Año invalido: $anio"
+
+		return 0
+	fi 
+
+	if [ $anio -eq $anio_actual ] && [ $mes -gt $mes_actual ]
+	then
+		# [DEBUG]
+		echo "Mes invalido: $mes"
 
 		return 0
 	fi
@@ -197,13 +231,13 @@ INIT_OK=true
 Verifico_inicializacion
 
 # Seteo variables de ambiente
-grupo=$HOME/Grupo4
+grupo=$HOME/Grupo4	
 DIRECTORIO_ARRIBOS=$grupo/$exDIR_EXT
 DIRECTORIO_ACEPTADOS=$grupo/$exDIR_ACCEPT
 DIRECTORIO_RECHAZADOS=$grupo/$exDIR_REFUSE
 
-PATH_MAESTRO_PAIS_CODIGO=$grupo/$exDIR_MASTER/p-s.mae
-PATH_INTERPRETE=$grupo/$exDIR_EXEC/InterpretO.sh
+PATH_MAESTRO_PAIS_CODIGO=$grupo/$exDIR_MASTER/p-s.maePATH
+PATH_INTERPRETE=$grupo/$exDIR_EXEC/InterpretO.shPATH
 
 numero_ciclo=1
 
@@ -212,9 +246,10 @@ interprete_iniciado=false
 while true
 do
 	# registro el numero de ciclo [LOG]
+	echo "Ciclo: $numero_ciclo"
 	echo "Analizo directorio de archivos recibidos"
 
-	# Recorro los nombres de los archivos en el directorio de arribos
+	# Recorro los archivos en el directorio de arribos
 	for nombre_archivo in $(cd $DIRECTORIO_ARRIBOS && ls)
 	do
 	    Verificar_archivo_recibido $nombre_archivo	
@@ -225,13 +260,12 @@ do
     	if [ $archivo_valido == 1 ]
 		then
 			Mover_archivo $DIRECTORIO_ARRIBOS $DIRECTORIO_ACEPTADOS $nombre_archivo
+		else
+			Mover_archivo $DIRECTORIO_ARRIBOS $DIRECTORIO_RECHAZADOS $nombre_archivo
     	fi
 
 	done  
 
-	# Muevo todos los archivos que no fueron aceptados
-	Mover_archivos_rechazados
-	
 	Validar_estado_interprete
 
 	numero_ciclo=$(($numero_ciclo + 1))
