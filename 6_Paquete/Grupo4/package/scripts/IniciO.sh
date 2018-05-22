@@ -181,25 +181,17 @@ Iniciar_Demonio()
 	Log_Info "Se inicia el detector de novedades en el proceso: $demonio_PID" "Iniciar_Demonio"
 }
 
-# Preguntar e iniciar el modulo de reportes
-Iniciar_Reportes()
-{
-	while [ "$ch_IniciarReportes" != "n"  -a "$ch_IniciarReportes" != "s" ]
-	do
-		read -r -e -n 1 -p "Desea iniciar el modulo de reportes? (s/n): " ch_IniciarReportes
-	done
-	
-	if [ "$ch_IniciarReportes" == "s" ]
-	then
-		$grupo/$exDIR_EXEC/$bin_Reportes
-	fi
-}
 
-Leer_Config
-Verificar_Directorios
-Verificar_Archivos
-Verificar_Permisos
-Setear_ambiente
+if [ "$exINIT_OK" == 1 ]
+then
+    echo "El ambiente ya fue inicializado anteriormente."
+else
+    Leer_Config
+    Verificar_Directorios
+    Verificar_Archivos
+    Verificar_Permisos
+    Setear_ambiente
+fi
 
 tmp_Retorno=
 Verificar_Demonio
@@ -208,5 +200,3 @@ then
 	Iniciar_Demonio
 fi
 
-sleep 1
-Iniciar_Reportes

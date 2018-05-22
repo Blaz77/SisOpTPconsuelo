@@ -1,7 +1,7 @@
 pidRecordFile="./pidRecord.dat"
 bin_Inicializador=IniciO.sh
+grupo=$HOME/Grupo4
 source ./Logger.sh
-logFile="../dirconf/StopO.log"
 
 # Params: string mensajeEspecifico, string funcionOrigen
 Log_Info()
@@ -9,6 +9,14 @@ Log_Info()
 	LogearMensaje "StopO" "INF" "$1" "$logFile"
 	echo "$1"
 }
+
+if [ "$exINIT_OK" != 1 ]
+then
+    echo "El ambiente no esta inicializado. No se puede continuar."
+    exit
+fi
+
+logFile=$exDIR_LOGS
 
 if [ -f $pidRecordFile ]
 then
