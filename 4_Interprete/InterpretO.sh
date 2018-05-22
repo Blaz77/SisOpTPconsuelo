@@ -22,7 +22,9 @@ Procesar()
 	#Fijate que a directorioAceptados ponele el nombre que vos le pusiste al crearlo
 	#Esa variable nos la tiene que dar InicializO.sh
 	LogearMensaje ${FUNCNAME[0]} "INF" "Procesando archivos" $archivoLogInterprete
-	if [ -e $directorioAceptados/* ]
+	cantidad_archivos_aceptados=$(ls $directorioAceptados | wc -l)
+
+	if [ $cantidad_archivos_aceptados != 0 ]
 		then
 			EvaluarArchivos
 	else
@@ -42,7 +44,7 @@ EvaluarArchivos()
 			Mover_Archivo
 			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo procesado: $archivo $logParaRegistroDeArchivo." $archivoLogInterprete
 	 	else
-			Mover_Archivo_A_Rechazados
+			Mover_Archivo_A_Rechazados $archivo
 	 	fi
 	done
 }
@@ -236,9 +238,10 @@ Mover_Archivo()
 	mv $directorioAceptados/$archivo $directorioDelDia
 }
 
+#Parametros: Archivo
 Mover_Archivo_A_Rechazados()
 {
-	esta_duplicado=$(ls $directorioRechazados | grep -c -i "$archivo")
+	esta_duplicado=$(ls $directorioRechazados | grep -c -i "$1")
 	existe_carpeta_duplicados=$(ls $directorioRechazados | grep -c duplicados)
 
 	if [ $esta_duplicado == 1 ]
@@ -249,11 +252,11 @@ Mover_Archivo_A_Rechazados()
 					mkdir $directorioRechazados/duplicados
 			fi
 			fecha_duplicado=$(date +%Y-%m-%d_%H:%M:%S)
-			mv $directorioAceptados/$archivo $directorioRechazados/duplicados/$archivo_$fecha_duplicado
-			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $archivo por estar duplicado. Se guarda como $archivo_$fecha_duplicado en $directorioRechazados/duplicados" $archivoLogInterprete
+			mv $directorioAceptados/$1 $directorioRechazados/duplicados/$1_$fecha_duplicado
+			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $1 por estar duplicado. Se guarda como $archivo_$fecha_duplicado en $directorioRechazados/duplicados" $archivoLogInterprete
 		else
-			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $archivo por estar duplicado. Se guarda en $directorioRechazados" $archivoLogInterprete
-			mv $directorioAceptados/$archivo $directorioRechazados/$archivo
+			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $1 por estar duplicado. Se guarda en $directorioRechazados" $archivoLogInterprete
+			mv $directorioAceptados/$1 $directorioRechazados/$1
 	fi
 }
 

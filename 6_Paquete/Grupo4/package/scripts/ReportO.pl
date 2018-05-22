@@ -1,5 +1,27 @@
 #!/usr/bin/perl
 
+sub Mostrar_Ayuda{
+	print "\n",
+		"Modo de uso:\n",
+		"  ReportO.pl <pais> [<sistema>] [<periodo>] [-a | -g]\n",
+		"\n",
+		"Condiciones de ejecucion:\n",
+		"  El sistema debe estar inicializado\n",
+		"\n",
+		"Parametros:\n",
+		"  <pais>	(OBLIGATORIO)\n",
+		"		Codigo de pais.\n",
+		"  <sistema> \n",
+		"		Codigo del sistema. Si se omite se consideran todos.\n",
+		"  <periodo> \n",
+		"		Periodo de tiempo a filtrar (En anios). Ejemplo: 2016-2018.\n",
+		"\n",
+		"  -g		Si se define, se guardan los resultados en un archivo.\n",
+		"			En caso contrario, se muestra por pantalla.\n",
+		"  -a		Muestra esta ayuda\n",
+		"\n";
+}
+
 sub leerArchivos
 {
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
@@ -44,16 +66,31 @@ sub leerArchivos
 	close(MAESTRO);
 }
 
+sub Gestionar_Parametros
+{
+	my %parametros = ();
+	getopts('ag', \%parametros) or die Mostrar_Ayuda();
 
+	Mostrar_Ayuda() if defined $parametros{a};
+}
+
+sub Verificar_Ambiente
+{
+	my $ambienteOK = $ENV{exINIT_OK};
+	die "El ambiente no esta inicializado. No se puede continuar." if $ambienteOK != 1;
+}
+
+sub Mostrar_Menu
+{
+	print "Bienvenido al sistema de reportes Elija el tipo de reporte que desea realizar:\n";
+	print "(1) - Recomendacion.\n";
+	print "(2) - Listar Divergencias en porcentaje.\n";
+	print "(3) - Listar Divergencias en monto.\n";
+}
 
 system("clear");
 
-my $ambienteOK = $ENV{exINIT_OK}
-die "El ambiente no esta inicializado. No se puede continuar." if $ambienteOK != 1;
-
-print "Bienvenido al sistema de reportes Elija el tipo de reporte que desea realizar:\n";
-print "(1) - Recomendacion.\n";
-print "(2) - Listar Divergencias en porcentaje.\n";
-print "(3) - Listar Divergencias en monto.\n";
-
+&Gestionar_Parametros;
+&Verificar_Ambiente;
+&Mostrar_Menu;
 &leerArchivos;
