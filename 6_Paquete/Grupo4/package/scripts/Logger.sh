@@ -1,5 +1,5 @@
-MAX_NUM_LINEAS=200
-LINEAS_A_TOMAR=150
+MAX_NUM_LINEAS=10
+LINEAS_A_TOMAR=3
 directorioLogs=$grupo/$exDIR_LOGS
 
 LogearMensaje()
