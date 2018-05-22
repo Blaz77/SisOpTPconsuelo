@@ -39,7 +39,7 @@ cp $DIFERENCIAL/"2_Inicializador"/"IniciO.sh" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/p
 cp $DIFERENCIAL/"2_Inicializador"/"StopO.sh" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/package/scripts
 cp $DIFERENCIAL/"3_Demonio"/"DetectO.sh" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/package/scripts
 cp $DIFERENCIAL/"4_Interprete"/"InterpretO.sh" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/package/scripts
-cp $DIFERENCIAL/"5_Reportes"/"ReportO.sh" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/package/scripts
+cp $DIFERENCIAL/"5_Reportes"/"ReportO.pl" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/package/scripts
 cp $DIFERENCIAL/"Logger.sh" $DIFERENCIAL/$DIR_PAQUETE/Grupo4/package/scripts
 
 echo "Generando tgz..."

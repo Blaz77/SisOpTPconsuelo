@@ -219,7 +219,7 @@ Mover_Archivos()
 	archivoAMover="$paqueteOrigen/scripts/InterpretO.sh"
 	cp $archivoAMover $rutaScripts
 
-	archivoAMover="$paqueteOrigen/scripts/ReportO.sh"
+	archivoAMover="$paqueteOrigen/scripts/ReportO.pl"
 	cp $archivoAMover $rutaScripts
 
 	LogearMensaje ${FUNCNAME[0]} "INF" "Se movieron los archivos del paquete de origen a las rutas establecidas por el usuario." $archivoLogInstalacion

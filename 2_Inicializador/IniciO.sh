@@ -11,7 +11,7 @@ bin_Inicializador=IniciO.sh
 bin_Demonio=DetectO.sh
 bin_Killer=StopO.sh
 bin_Interprete=InterpretO.sh
-bin_Reportes=ReportO.sh
+bin_Reportes=ReportO.pl
 
 mae_Files="p-s.mae PPI.mae"
 table_Files="T1.tab T2.tab"
