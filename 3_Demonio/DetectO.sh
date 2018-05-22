@@ -9,7 +9,6 @@
 # Cambiar variables de ambiente [REPLACE]
 
 # Falta verificar periodo actual
-# Falta verificar con los archivos maestros
 
 ######################################################### Funciones auxiliares #########################################################
 
@@ -23,14 +22,13 @@
 
 Iniciar_interprete()
 {
-	# [REPLACE] InterpreteO
 	$PATH_INTERPRETE &
 
 	# $! guarda el PID del proceso en background
 	pid_Interprete=$!	
 }
 
-# Invocar al interprete si hay archivos en la carpeta aceptados y si no se encuentra en ejecucion
+# Invoca al interprete si hay archivos en la carpeta aceptados y si no se encuentra en ejecucion
 Validar_estado_interprete()
 {
 	# [DEBUG]
@@ -140,23 +138,39 @@ Mover_archivo()
 
 Verificar_archivo_recibido()
 {
-	# Verifico formato del nombre de archivo y su extension
+	# Verifico formato del nombre de archivo
 	nombre_valido=$(echo $1 | grep -c '^[Aa-Zz]\{1\}-[0-9]\{1\}-[0-9]\{4\}-[0-9]\{2\}$')
 
 	# Verifico contenido archivo que no este vacio
-	# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
 	esta_vacio=$(grep -c '^$' $DIRECTORIO_ARRIBOS/$1)
 
-	if [ $nombre_valido != 1 ] || [ $esta_vacio == 1 ] || [ ! -f $DIRECTORIO_ARRIBOS/$1 ]
+	codigo_pais=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.*\)/\1/')
+	
+	# [DEBUG]
+	# echo "codigo pais: $codigo_pais"
+
+	codigo_sistema=$(echo $1 | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.*\)/\2/')
+
+	# [DEBUG]
+	# echo "codigo sistema: $codigo_sistema"
+
+	# Verifico contra archivo maestro pais-sistema
+	pais_sistema_valido=$(grep -i -c "^$codigo_pais-.*-$codigo_sistema-" $PATH_MAESTRO_PAIS_CODIGO)
+
+	# [DEBUG]
+	# echo "Pais-Sistema valido: $pais_sistema_valido" 
+
+	# Verificar que el archivo sea regular
+	if [ $nombre_valido != 1 ] || [ $esta_vacio == 1 ] || [ ! -f $DIRECTORIO_ARRIBOS/$1 ] || [ pais_sistema_valido == 0 ]
 	then
 		# [DEBUG]
-		#echo "Archivo invalido"
+		echo "Archivo invalido"
 
 		return 0
 	fi
 
 	# [DEBUG]
-	# echo "Archivo valido"
+	echo "Archivo valido"
 
 	return 1
 }
@@ -183,12 +197,12 @@ INIT_OK=true
 Verifico_inicializacion
 
 # Seteo variables de ambiente
-# [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
 grupo=$HOME/Grupo4
-
 DIRECTORIO_ARRIBOS=$grupo/$exDIR_EXT
 DIRECTORIO_ACEPTADOS=$grupo/$exDIR_ACCEPT
 DIRECTORIO_RECHAZADOS=$grupo/$exDIR_REFUSE
+
+PATH_MAESTRO_PAIS_CODIGO=$grupo/$exDIR_MASTER/p-s.mae
 PATH_INTERPRETE=$grupo/$exDIR_EXEC/InterpretO.sh
 
 numero_ciclo=1
