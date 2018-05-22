@@ -20,7 +20,7 @@ table_Files="T1.tab T2.tab"
 Error_Fatal()
 {
 	error="Imposible inicializar el sistema: $1"
-	LogearMensaje "IniciO" "ERR" "$error" "$logFile"
+	LogearMensaje "$2" "ERR" "$error" "$logFile"
 	echo "$error"
 	exit
 }
@@ -28,7 +28,7 @@ Error_Fatal()
 # Params: string mensajeEspecifico, string funcionOrigen
 Log_Info()
 {
-	LogearMensaje "IniciO" "INF" "$1" "$logFile"
+	LogearMensaje "$2" "INF" "$1" "$logFile"
 	echo "$1"
 }
 
@@ -36,7 +36,6 @@ Leer_Config()
 {
 	exDIR_EXEC=$(grep '^Ejecutables.*' $configFile | cut -f2 -d'-')
 	exDIR_MASTER=$(grep '^Maestros.*' $configFile | cut -f2 -d'-')
-	# TODO : Cambiar por Arribos
 	exDIR_EXT=$(grep '^Externos.*' $configFile | cut -f2 -d'-')
 	exDIR_ACCEPT=$(grep '^Aceptados.*' $configFile | cut -f2 -d'-')
 	exDIR_REFUSE=$(grep '^Rechazados.*' $configFile | cut -f2 -d'-')
@@ -48,7 +47,7 @@ Leer_Config()
 	do
 		if [ $i == "" ]
 		then
-			Error_Fatal "Archivo de configuracion dañado" "Leer_config"
+			Error_Fatal "Archivo de configuracion daniado" "Leer_config"
 		fi
 	done
 	
@@ -118,9 +117,9 @@ Verificar_Permiso_Ejecucion() # Params: string dirName, string fileName
 	if [ ! -x $grupo/$1/$2 ]
 	then
 		chmod +x $grupo/$1/$2
-		Log_Info "Se agrega permiso de ejecucioon para el archivo $2." "Verificar_Permiso_Ejecucion"
+		Log_Info "Se agrega permiso de ejecucion para el archivo $2." "Verificar_Permiso_Ejecucion"
 	else
-		Log_Info "$2: Permiso de ejecucioon OK." "Verificar_Permiso_Ejecucion"
+		Log_Info "$2: Permiso de ejecucion OK." "Verificar_Permiso_Ejecucion"
 	fi
 }
 
