@@ -43,7 +43,6 @@ EvaluarArchivos()
 			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo procesado: $archivo $logParaRegistroDeArchivo." $archivoLogInterprete
 	 	else
 			Mover_Archivo_A_Rechazados
-			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo rechazado: $archivo. Ya había sido procesado durante el dia." $archivoLogInterprete
 	 	fi
 	done
 }
@@ -239,14 +238,23 @@ Mover_Archivo()
 
 Mover_Archivo_A_Rechazados()
 {
-	###Creo directorio del día si es que no existe y muevo el archivo procesado
-	fecha=$(date +"%Y%m%d")
-	if [ ! -e $directorioRechazados/$fecha ]
-	then
-		mkdir $directorioRechazados/$fecha
+	esta_duplicado=$(ls $directorioRechazados | grep -c -i "$archivo")
+	existe_carpeta_duplicados=$(ls $directorioRechazados | grep -c duplicados)
+
+	if [ $esta_duplicado == 1 ]
+		then
+			if [ $existe_carpeta_duplicados == 0 ]
+				then
+					LogearMensaje ${FUNCNAME[0]} "INF" "Se crea carpeta de duplicados en $directorioRechazados" $archivoLogInterprete
+					mkdir $directorioRechazados/duplicados
+			fi
+			fecha_duplicado=$(date +%Y-%m-%d_%H:%M:%S)
+			mv $directorioAceptados/$archivo $directorioRechazados/duplicados/$archivo_$fecha_duplicado
+			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $archivo por estar duplicado. Se guarda como $archivo_$fecha_duplicado en $directorioRechazados/duplicados" $archivoLogInterprete
+		else
+			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $archivo por estar duplicado. Se guarda en $directorioRechazados" $archivoLogInterprete
+			mv $directorioAceptados/$archivo $directorioRechazados/$archivo
 	fi
-	directorioDelDia="$directorioRechazados/$fecha"
-	mv $directorioAceptados/$archivo $directorioRechazados
 }
 
 ValidarSiYaFueProcesadoElArchivo()
