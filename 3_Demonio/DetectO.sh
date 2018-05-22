@@ -184,10 +184,12 @@ Verifico_inicializacion
 
 # Seteo variables de ambiente
 # [REPLACE]: !REEMPLAZAR POR VARIABLE DE INICIALIZADOR!
-DIRECTORIO_ARRIBOS=/home/jleyes/ARRIBOS
-DIRECTORIO_ACEPTADOS=/home/jleyes/Aceptados
-DIRECTORIO_RECHAZADOS=/home/jleyes/Rechazados
-PATH_INTERPRETE=/home/jleyes/InterpreteMock.sh
+grupo=$HOME/Grupo4
+
+DIRECTORIO_ARRIBOS=$grupo/$exDIR_EXT
+DIRECTORIO_ACEPTADOS=$grupo/$exDIR_ACCEPT
+DIRECTORIO_RECHAZADOS=$grupo/$exDIR_REFUSE
+PATH_INTERPRETE=$grupo/$exDIR_EXEC/InterpretO.sh
 
 numero_ciclo=1
 
