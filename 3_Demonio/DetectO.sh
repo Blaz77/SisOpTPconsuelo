@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./Logger.sh
+
 # Se ejecuta en background . ./DetectO.sh &
 # Nombre log DetecO.log
 
@@ -242,8 +244,6 @@ Verifico_inicializacion()
 	if [ $exINIT_OK != 1 ]
 	then
 		echo "El sistema no esta correctamente inicializado, fin de la ejecucion."
-
-		Log_Error "Verifico_inicializacion" "El sistema no esta correctamente inicializado, fin de la ejecucion."
 		
 		exit 1
 	fi	
@@ -267,8 +267,6 @@ Log_Info()
 
 ######################################################### Detector de novedades #########################################################
 
-Verifico_inicializacion
-
 # Seteo variables de ambiente
 grupo=$HOME/Grupo4
 DIRECTORIO_ARRIBOS=$grupo/$exDIR_EXT
@@ -277,7 +275,9 @@ DIRECTORIO_RECHAZADOS=$grupo/$exDIR_REFUSE
 
 PATH_MAESTRO_PAIS_CODIGO=$grupo/$exDIR_MASTER/p-s.mae
 PATH_INTERPRETE=$grupo/$exDIR_EXEC/InterpretO.sh
-PATH_LOG=$grupo/$exDIR_LOGS/DetecO.log
+PATH_LOG=$grupo/$exDIR_LOGS/DetectO.log
+
+Verifico_inicializacion
 
 numero_ciclo=1
 
