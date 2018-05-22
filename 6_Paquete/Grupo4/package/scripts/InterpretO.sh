@@ -7,6 +7,7 @@ source ./Logger.sh
 directorioAceptados=$grupo/$exDIR_ACCEPT
 directorioArchivosMaestros=$grupo/$exDIR_MASTER
 directorioProcesados=$grupo/$exDIR_PROCESS
+directorioRechazados=$grupo/$exDIR_REFUSE
 
 directorioLogs=$grupo/$exDIR_LOGS
 archivoLogInterprete=$directorioLogs/InterpretO.log
@@ -41,6 +42,7 @@ EvaluarArchivos()
 			Mover_Archivo
 			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo procesado: $archivo $logParaRegistroDeArchivo." $archivoLogInterprete
 	 	else
+			Mover_Archivo_A_Rechazados
 			LogearMensaje ${FUNCNAME[0]} "INF" "Archivo rechazado: $archivo. Ya había sido procesado durante el dia." $archivoLogInterprete
 	 	fi
 	done
@@ -233,6 +235,18 @@ Mover_Archivo()
 	fi
 	directorioDelDia="$directorioProcesados/$fecha"
 	mv $directorioAceptados/$archivo $directorioDelDia
+}
+
+Mover_Archivo_A_Rechazados()
+{
+	###Creo directorio del día si es que no existe y muevo el archivo procesado
+	fecha=$(date +"%Y%m%d")
+	if [ ! -e $directorioRechazados/$fecha ]
+	then
+		mkdir $directorioRechazados/$fecha
+	fi
+	directorioDelDia="$directorioRechazados/$fecha"
+	mv $directorioAceptados/$archivo $directorioRechazados
 }
 
 ValidarSiYaFueProcesadoElArchivo()
