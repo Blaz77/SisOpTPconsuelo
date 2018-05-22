@@ -163,7 +163,7 @@ Verificar_Demonio()
 	then
 		local PID=
 		read -r PID < $grupo/$exDIR_EXEC/$pidRecordFile
-		local PID_PS=$(ps -fo pid,args -p $PID | grep ".*$PID.*Grupo4.*\.sh$" | cut -f1 -d' ')
+		local PID_PS=$(ps -fo pid,args -p $PID | grep ".*$PID.*Grupo4.*\.sh$" | sed -e 's/^[ \t]*//' | cut -f1 -d' ')
 		if [ "$PID" == "$PID_PS" -a "$PID_PS" != "" ]
 		then
 			tmp_Retorno=$PID
