@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+use Getopt::Std;
+
 sub Mostrar_Ayuda{
 	print "\n",
 		"Modo de uso:\n",
@@ -25,8 +27,8 @@ sub Mostrar_Ayuda{
 sub leerArchivos
 {
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
-	($archivo_prestamos) = "PRESTAMOS.Argentina";
-	($archivo_maestro) = "PPI.mae";
+	($archivo_prestamos) = "$ENV{HOME}/Grupo4/$ENV{exDIR_PROCESS}/PRESTAMOS.Argentina";
+	($archivo_maestro) = "$ENV{HOME}/Grupo4/$ENV{exDIR_MASTER}/PPI.mae";
 	print "Nombre de los archivos: $archivo_prestamos, $archivo_maestro \n";
 
 	open(PRESTAMOS, "<$archivo_prestamos") || die "ERROR: no se pudo abrir el archivo $archivo_prestamos";
@@ -70,8 +72,11 @@ sub Gestionar_Parametros
 {
 	my %parametros = ();
 	getopts('ag', \%parametros) or die Mostrar_Ayuda();
-
-	Mostrar_Ayuda() if defined $parametros{a};
+    if (defined $parametros{a})
+    {
+        Mostrar_Ayuda();
+        die "";
+    }
 }
 
 sub Verificar_Ambiente
