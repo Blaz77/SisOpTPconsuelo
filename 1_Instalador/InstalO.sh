@@ -171,14 +171,14 @@ Estado de la instalación: LISTA
 
 Crear_Directorios()
 {
-	mkdir $grupo/$1
-	mkdir $grupo/$2
-	mkdir $grupo/$3
-	mkdir $grupo/$4
-	mkdir $grupo/$5
-	mkdir $grupo/$6
-	mkdir $grupo/$7
-	mkdir $grupo/$8
+	mkdir -p "$grupo/$1"
+	mkdir -p "$grupo/$2"
+	mkdir -p "$grupo/$3"
+	mkdir -p "$grupo/$4"
+	mkdir -p "$grupo/$5"
+	mkdir -p "$grupo/$6"
+	mkdir -p "$grupo/$7"
+	mkdir -p "$grupo/$8"
 	echo "Directorios creados exitosamente"
 	LogearMensaje ${FUNCNAME[0]} "INF" "Se crearon los directorios exitosamente." $archivoLogInstalacion
 
