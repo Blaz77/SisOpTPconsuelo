@@ -18,72 +18,96 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de ejecutables ($1):"
+		read -p "Defina el directorio de ejecutables ($1): " dirEjecutables
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de ejecutables" $archivoLogInstalacion
-		read dirEjecutables
+		if [ "$dirEjecutables" = "" ]
+		then
+			dirEjecutables=$1
+		fi
 		Validar_Nombre "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de archivos maestros ($2):"
+		read -p "Defina el directorio de archivos maestros ($2): " dirMaestros
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos maestros" $archivoLogInstalacion
-		read dirMaestros
+		if [ "$dirMaestros" = "" ]
+		then
+			dirMaestros=$2
+		fi
 		Validar_Nombre "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de arribo de archivos externos ($3):"
+		read -p "Defina el directorio de arribo de archivos externos ($3): " dirExternos
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos externos" $archivoLogInstalacion
-		read dirExternos
+		if [ "$dirExternos" = "" ]
+		then
+			dirExternos=$3
+		fi
 		Validar_Nombre "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de novedades aceptadas ($4):"
+		read -p "Defina el directorio de novedades aceptadas ($4): " dirAceptados
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de novedades aceptadas" $archivoLogInstalacion
-		read dirAceptados
+		if [ "$dirAceptados" = "" ]
+		then
+			dirAceptados=$4
+		fi
 		Validar_Nombre "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de archivos rechazados ($5):"
+		read -p "Defina el directorio de archivos rechazados ($5): " dirRechazados
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos rechazados" $archivoLogInstalacion
-		read dirRechazados
+		if [ "$dirRechazados" = "" ]
+		then
+			dirRechazados=$5
+		fi
 		Validar_Nombre "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de archivos procesados ($6):"
+		read -p "Defina el directorio de archivos procesados ($6): " dirProcesados
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos procesados" $archivoLogInstalacion
-		read dirProcesados
+		if [ "$dirProcesados" = "" ]
+		then
+			dirProcesados=$6
+		fi
 		Validar_Nombre "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de reportes ($7):"
+		read -p "Defina el directorio de reportes ($7): " dirReportes
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de reportes" $archivoLogInstalacion
-		read dirReportes
+		if [ "$dirReportes" = "" ]
+		then
+			dirReportes=$7
+		fi
 		Validar_Nombre "$dirReportes" "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
 	valido=false
 	while [ $valido = false ]
 	do
-		echo "Defina el directorio de logs de auditoría del sistema ($8):"
+		read -p "Defina el directorio de logs de auditoría del sistema ($8): " dirLogs
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de logs de auditoría del sistema" $archivoLogInstalacion
-		read dirLogs
+		if [ "$dirLogs" = "" ]
+		then
+			dirLogs=$8
+		fi
 		Validar_Nombre "$dirLogs" "$dirReportes" "$dirProcesados" "$dirRechazados" "$dirAceptados" "$dirExternos" "$dirMaestros" "$dirEjecutables"
 	done
 
@@ -93,21 +117,17 @@ Pedir_Nombres_Directorios()
 ####Validar_Nombre recibe varios parametros: primero el directorio actual y despues los anteriormente ingresados
 Validar_Nombre()
 {
-	if [ "$1" = "$directorioVacio" ]
-	then
-		valido=false
-		LogearMensaje ${FUNCNAME[0]} "ALE" "Define el nombre de directorio vacio" $archivoLogInstalacion
-	elif [ $1 = "dirconf" ]
+	if [ "$1" = "dirconf" ]
 	then
 		valido=false
 		LogearMensaje ${FUNCNAME[0]} "ERR" "Define el nombre de directorio directorio como dirconf y eso es invalido" $archivoLogInstalacion
-	elif [ $1 = "package" ]
+	elif [ "$1" = "package" ]
 	then
 		valido=false
 		LogearMensaje ${FUNCNAME[0]} "ERR" "Define el nombre de directorio directorio como package y eso es invalido" $archivoLogInstalacion
 	else
 		valido=true
-
+	
 	    ####valido que sea diferente a los anteriormente ingresados
 	    let	contador=0
 	    for i in $@
