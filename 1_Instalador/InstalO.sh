@@ -18,7 +18,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de ejecutables ($1): " dirEjecutables
+		read -p "Defina el directorio de ejecutables ($1): " "dirEjecutables"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de ejecutables" $archivoLogInstalacion
 		if [ "$dirEjecutables" = "" ]
 		then
@@ -30,7 +30,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de archivos maestros ($2): " dirMaestros
+		read -p "Defina el directorio de archivos maestros ($2): " "dirMaestros"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos maestros" $archivoLogInstalacion
 		if [ "$dirMaestros" = "" ]
 		then
@@ -42,7 +42,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de arribo de archivos externos ($3): " dirExternos
+		read -p "Defina el directorio de arribo de archivos externos ($3): " "dirExternos"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos externos" $archivoLogInstalacion
 		if [ "$dirExternos" = "" ]
 		then
@@ -54,7 +54,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de novedades aceptadas ($4): " dirAceptados
+		read -p "Defina el directorio de novedades aceptadas ($4): " "dirAceptados"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de novedades aceptadas" $archivoLogInstalacion
 		if [ "$dirAceptados" = "" ]
 		then
@@ -66,7 +66,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de archivos rechazados ($5): " dirRechazados
+		read -p "Defina el directorio de archivos rechazados ($5): " "dirRechazados"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos rechazados" $archivoLogInstalacion
 		if [ "$dirRechazados" = "" ]
 		then
@@ -78,7 +78,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de archivos procesados ($6): " dirProcesados
+		read -p "Defina el directorio de archivos procesados ($6): " "dirProcesados"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de archivos procesados" $archivoLogInstalacion
 		if [ "$dirProcesados" = "" ]
 		then
@@ -90,7 +90,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de reportes ($7): " dirReportes
+		read -p "Defina el directorio de reportes ($7): " "dirReportes"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de reportes" $archivoLogInstalacion
 		if [ "$dirReportes" = "" ]
 		then
@@ -102,7 +102,7 @@ Pedir_Nombres_Directorios()
 	valido=false
 	while [ $valido = false ]
 	do
-		read -p "Defina el directorio de logs de auditoría del sistema ($8): " dirLogs
+		read -p "Defina el directorio de logs de auditoría del sistema ($8): " "dirLogs"
 		LogearMensaje ${FUNCNAME[0]} "INF" "Se solicita ingreso de directorio de logs de auditoría del sistema" $archivoLogInstalacion
 		if [ "$dirLogs" = "" ]
 		then
@@ -127,21 +127,21 @@ Validar_Nombre()
 		LogearMensaje ${FUNCNAME[0]} "ERR" "Define el nombre de directorio directorio como package y eso es invalido" $archivoLogInstalacion
 	else
 		valido=true
-	
+
 	    ####valido que sea diferente a los anteriormente ingresados
 	    let	contador=0
 	    for i in $@
 	    do
 		    let contador=contador+1
 		    ###que $contador sea > que 1 para que no se compare con si mismo
-		    if [ $contador \> "1" -a $1 = $i ]
+		    if [ $contador \> "1" -a "$1" = $i ]
 		    then
 			    valido=false
 		    fi
 	    done
 
 	    ####valido que no exista el uno ya creado con ese nombre
-	    if [ -e $grupo/$1 ]
+	    if [ -e "$grupo/$1" ]
 	    then
 		    valido=false
 	    fi
@@ -181,11 +181,11 @@ Estado de la instalación: LISTA
 	then
 		echo "Vuelva a ingresar los nombres de los directorios"
 		LogearMensaje ${FUNCNAME[0]} "INF" "El usuario no confirma los directorios.Se procede a pedir el ingreso nuevamente." $archivoLogInstalacion
-		Pedir_Nombres_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
+		Pedir_Nombres_Directorios "$dirEjecutables" "$dirMaestros" "$dirExternos" "$dirAceptados" "$dirRechazados" "$dirProcesados" "$dirReportes" "$dirLogs"
 	elif [ $confirmaInstalacion = "SI" ]
 		then
 			LogearMensaje ${FUNCNAME[0]} "INF" "El usuario confirma los directorios." $archivoLogInstalacion
-		  Crear_Directorios $dirEjecutables $dirMaestros $dirExternos $dirAceptados $dirRechazados $dirProcesados $dirReportes $dirLogs
+		  Crear_Directorios "$dirEjecutables" "$dirMaestros" "$dirExternos" "$dirAceptados" "$dirRechazados" "$dirProcesados" "$dirReportes" "$dirLogs"
 	fi
 }
 

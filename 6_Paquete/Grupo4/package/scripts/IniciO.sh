@@ -178,7 +178,7 @@ Iniciar_Demonio()
 	$grupo/$exDIR_EXEC/$bin_Demonio &
 	demonio_PID=$!
 	echo "$demonio_PID" > "$pidRecordFile"
-	Log_Info "Se inicia el detector de novedades en el proceso: $demonio_PID" "Iniciar_Demonio"
+	Log_Info "Se inicia el detector de novedades en el proceso: $demonio_PID. Para detener el detector ejecute el comando StopO.sh" "Iniciar_Demonio"
 }
 
 

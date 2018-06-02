@@ -1,5 +1,6 @@
 MAX_NUM_LINEAS=200
 LINEAS_A_TOMAR=150
+grupo=$HOME/Grupo4
 directorioLogs=$grupo/$exDIR_LOGS
 
 LogearMensaje()
@@ -20,6 +21,7 @@ LogearMensaje()
 
 ReducirArchivoDeLog()
 {
-    tail $1 -n $LINEAS_A_TOMAR > $directorioLogs/temp.log
+    echo "log truncado... " > $directorioLogs/temp.log
+    tail $1 -n $LINEAS_A_TOMAR >> $directorioLogs/temp.log
     mv $directorioLogs/temp.log $1
 }
