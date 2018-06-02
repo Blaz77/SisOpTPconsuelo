@@ -20,7 +20,7 @@ Iniciar_interprete()
 	"$PATH_INTERPRETE" &
 
 	# $! guarda el PID del proceso en background
-	pid_Interprete=$!	
+	pid_Interprete=$!
 
 	#[DEBUG]
 	#echo "Validador invocado: process id $pid_Interprete"
@@ -32,9 +32,9 @@ Iniciar_interprete()
 Validar_estado_interprete()
 {
 	#[DEBUG]
-	#echo "Analizando estado del interprete"	
+	#echo "Analizando estado del interprete"
 
-	cantidad_archivos_aceptados=$(ls $DIRECTORIO_ACEPTADOS | wc -l)
+	cantidad_archivos_aceptados=$(ls "$DIRECTORIO_ACEPTADOS" | wc -l)
 
 	if [ $cantidad_archivos_aceptados != 0 ]
 	then
@@ -47,13 +47,13 @@ Validar_estado_interprete()
 		if [ $interprete_iniciado == false ]
 		then
 
-			Iniciar_interprete		
+			Iniciar_interprete
 
 			interprete_iniciado=true
 
 		else
 
-			interprete_sigue_corriendo=$(ps -p $pid_Interprete | wc -l)	
+			interprete_sigue_corriendo=$(ps -p $pid_Interprete | wc -l)
 
 			# interprete_sigue_corriendo == 1, no se encuentra en ejecucion
 			if [ $interprete_sigue_corriendo == 1 ]
@@ -70,11 +70,11 @@ Validar_estado_interprete()
 			fi
 		fi
 
-		return 
+		return
 	fi
 
 	#[DEBUG]
-	#echo "No hay archivos para ejecutar el interprete"		
+	#echo "No hay archivos para ejecutar el interprete"
 
 	Log_Info "Validar_estado_interprete" "No hay archivos para ejecutar el interprete"
 }
@@ -115,7 +115,7 @@ Mover_archivo()
 		#echo "Fecha archivo duplicado: $fecha_duplicado"
 
 		mv "$1/$3" "$2/duplicados/$3_$fecha_duplicado"
-		
+
 		#[DEBUG]
 		#echo "Muevo novedad duplicada: $3"
 
@@ -123,7 +123,7 @@ Mover_archivo()
 
 	else
 
-		#[DEBUG] 
+		#[DEBUG]
 		#echo "Muevo novedad aceptada: $3"
 
 		Log_Info "Mover_archivo" "Muevo novedad: $3 a $2"
@@ -150,7 +150,7 @@ Verificar_archivo_recibido()
 	# Verifico archivo no vacio
 	esta_vacio=$(grep -c '^$' "$DIRECTORIO_ARRIBOS/$1")
 
-	if [ $esta_vacio == 1 ] 
+	if [ $esta_vacio == 1 ]
 	then
 		#[DEBUG]
 		#echo "Novedad rechazada: $1, motivo del descarte: el archivo esta vacio."
@@ -173,7 +173,7 @@ Verificar_archivo_recibido()
 
 	# Verifico contra archivo maestro pais-sistema
 	codigo_pais=$(echo "$1" | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.\{4\}\)-\(.\{2\}\)/\1/')
-	
+
 	#[DEBUG]
 	#echo "codigo pais: $codigo_pais"
 
@@ -185,7 +185,7 @@ Verificar_archivo_recibido()
 	pais_sistema_valido=$(grep -i -c "^$codigo_pais-.*-$codigo_sistema-" $PATH_MAESTRO_PAIS_CODIGO)
 
 	#[DEBUG]
-	#echo "Pais-Sistema valido: $pais_sistema_valido" 
+	#echo "Pais-Sistema valido: $pais_sistema_valido"
 
 	if [ $pais_sistema_valido == 0 ]
 	then
@@ -199,7 +199,7 @@ Verificar_archivo_recibido()
 
 	# Verifico que no sea superior al periodo actual
 	anio=$(echo "$1" | sed 's/\(.\{1\}\)-\(.\{1\}\)-\(.\{4\}\)-\(.\{2\}\)/\3/')
-	
+
 	#[DEBUG]
 	#echo "Anio: $anio"
 
@@ -218,9 +218,9 @@ Verificar_archivo_recibido()
 		#echo "Novedad rechazada: $1, motivo del descarte: año adelantado."
 
 		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: año adelantado."
-		
+
 		return 0
-	fi 
+	fi
 
 	if [ ! $anio -gt "2015" ]
 	then
@@ -228,7 +228,7 @@ Verificar_archivo_recibido()
 		#echo "Novedad rechazada: $1, motivo del descarte: año menor a 2016"
 
 		Log_Info "Verificar_archivo_recibido" "Novedad rechazada: $1, motivo del descarte: año menor a 2016."
-		
+
 		return 0
 	fi
 
@@ -256,13 +256,13 @@ Verifico_inicializacion()
 	if [ $exINIT_OK != 1 ]
 	then
 		echo "El sistema no esta correctamente inicializado, fin de la ejecucion."
-		
+
 		exit 1
-	fi	
+	fi
 
 	Setear_variables_entorno
-	
-	echo "El sistema esta correctamente inicializado."	
+
+	echo "El sistema esta correctamente inicializado."
 
 	Log_Info "Verifico_inicializacion" "El sistema esta correctamente inicializado."
 }
@@ -288,10 +288,10 @@ Setear_variables_entorno()
 	DIRECTORIO_EJECUTABLES="$grupo/$exDIR_EXEC"
 	DIRECTORIO_MAESTROS="$grupo/$exDIR_MASTER"
 	DIRECTORIO_LOGS="$grupo/$exDIR_LOGS"
-	
+
 	PATH_MAESTRO_PAIS_CODIGO="$DIRECTORIO_MAESTROS/p-s.mae"
 	PATH_INTERPRETE="$DIRECTORIO_EJECUTABLES/InterpretO.sh"
-	PATH_LOG="$DIRECTORIO_LOGS/DetectO.log"	
+	PATH_LOG="$DIRECTORIO_LOGS/DetectO.log"
 }
 
 ######################################################### Detector de novedades #########################################################
@@ -316,7 +316,7 @@ do
 	#done
 
 	cd "$DIRECTORIO_ARRIBOS"
-	
+
 	for nombre_archivo in *;
 	do
 		if [ "$nombre_archivo" == '*' ]
@@ -339,7 +339,7 @@ do
 			Mover_archivo "$DIRECTORIO_ARRIBOS" "$DIRECTORIO_RECHAZADOS" "$nombre_archivo"
     	fi
 
-	done  
+	done
 
 	cd "$DIRECTORIO_EJECUTABLES"
 

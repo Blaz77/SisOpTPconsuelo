@@ -4,17 +4,17 @@ grupo=$HOME/Grupo4
 source ./Logger.sh
 
 #Estas variables deberian venir seteadas desde InicializO.sh
-directorioAceptados=$grupo/$exDIR_ACCEPT
-directorioArchivosMaestros=$grupo/$exDIR_MASTER
-directorioProcesados=$grupo/$exDIR_PROCESS
-directorioRechazados=$grupo/$exDIR_REFUSE
+directorioAceptados="$grupo/$exDIR_ACCEPT"
+directorioArchivosMaestros="$grupo/$exDIR_MASTER"
+directorioProcesados="$grupo/$exDIR_PROCESS"
+directorioRechazados="$grupo/$exDIR_REFUSE"
 
-directorioLogs=$grupo/$exDIR_LOGS
-archivoLogInterprete=$directorioLogs/InterpretO.log
+directorioLogs="$grupo/$exDIR_LOGS"
+archivoLogInterprete="$directorioLogs/InterpretO.log"
 
-archivoT1=$directorioArchivosMaestros/T1.tab
-archivoT2=$directorioArchivosMaestros/T2.tab
-archivops=$directorioArchivosMaestros/p-s.mae
+archivoT1="$directorioArchivosMaestros/T1.tab"
+archivoT2="$directorioArchivosMaestros/T2.tab"
+archivops="$directorioArchivosMaestros/p-s.mae"
 
 
 Procesar()
@@ -22,7 +22,7 @@ Procesar()
 	#Fijate que a directorioAceptados ponele el nombre que vos le pusiste al crearlo
 	#Esa variable nos la tiene que dar InicializO.sh
 	LogearMensaje ${FUNCNAME[0]} "INF" "Procesando archivos" $archivoLogInterprete
-	cantidad_archivos_aceptados=$(ls $directorioAceptados | wc -l)
+	cantidad_archivos_aceptados=$(ls "$directorioAceptados" | wc -l)
 
 	if [ $cantidad_archivos_aceptados != 0 ]
 		then
@@ -35,7 +35,7 @@ Procesar()
 EvaluarArchivos()
 {
 	#Busco todos los archivos a procesar
-	for archivo in $(cd $directorioAceptados && ls)
+	for archivo in $(cd "$directorioAceptados" && ls)
 	do
 		ValidarSiYaFueProcesadoElArchivo $archivo
 		if [ $ElArchivoEsValido = true ]
@@ -86,7 +86,7 @@ Procesar_Archivo()
 		InterpretarFecha
 		InterpretarMontos
 		GrabarArchivo
-	done < $directorioAceptados/$archivo
+	done < "$directorioAceptados/$archivo"
 }
 
 ResetearCampos()
@@ -223,7 +223,7 @@ GrabarArchivo()
 	MT_REST=$(echo $MT_REST | sed s/"\."/","/)
 
 	###Grabar nuevo archivo: va a tener 16 campos
-	echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> $directorioProcesados/PRESTAMOS.$nombrePais
+	echo "$SIS_ID;$CTB_ANIO;$CTB_MES;$CTB_DIA;$CTB_ESTADO;$PRES_ID;$MT_PRES;$MT_IMPAGO;$MT_INDE;$MT_INNODE;$MT_DEB;$MT_REST;$PRES_CLI_ID;$PRES_CLI;$FECHA;$USER" >> "$directorioProcesados/PRESTAMOS.$nombrePais"
 	logParaRegistroDeArchivo="$logParaRegistroDeArchivo Registro $contadorDeRegistro aceptado "
 }
 
@@ -231,40 +231,40 @@ Mover_Archivo()
 {
 	###Creo directorio del día si es que no existe y muevo el archivo procesado
 	fecha=$(date +"%Y%m%d")
-	if [ ! -e $directorioProcesados/$fecha ]
+	if [ ! -e "$directorioProcesados/$fecha" ]
 	then
-		mkdir $directorioProcesados/$fecha
+		mkdir "$directorioProcesados/$fecha"
 	fi
 	directorioDelDia="$directorioProcesados/$fecha"
-	mv $directorioAceptados/$archivo $directorioDelDia
+	mv "$directorioAceptados/$archivo" "$directorioDelDia"
 }
 
 #Parametros: Archivo
 Mover_Archivo_A_Rechazados()
 {
-	esta_duplicado=$(ls $directorioRechazados | grep -c -i "$1")
-	existe_carpeta_duplicados=$(ls $directorioRechazados | grep -c duplicados)
+	esta_duplicado=$(ls "$directorioRechazados" | grep -c -i "$1")
+	existe_carpeta_duplicados=$(ls "$directorioRechazados" | grep -c duplicados)
 
 	if [ $esta_duplicado == 1 ]
 		then
 			if [ $existe_carpeta_duplicados == 0 ]
 				then
 					LogearMensaje ${FUNCNAME[0]} "INF" "Se crea carpeta de duplicados en $directorioRechazados" $archivoLogInterprete
-					mkdir $directorioRechazados/duplicados
+					mkdir "$directorioRechazados/duplicados"
 			fi
 			fecha_duplicado=$(date +%Y-%m-%d_%H:%M:%S)
-			mv $directorioAceptados/$1 $directorioRechazados/duplicados/$1_$fecha_duplicado
+			mv "$directorioAceptados/$1" "$directorioRechazados/duplicados/$1_$fecha_duplicado"
 			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $1 por estar duplicado. Se guarda como $archivo_$fecha_duplicado en $directorioRechazados/duplicados" $archivoLogInterprete
 		else
 			LogearMensaje ${FUNCNAME[0]} "INF" "Se rechaza archivo $1 por estar duplicado. Se guarda en $directorioRechazados" $archivoLogInterprete
-			mv $directorioAceptados/$1 $directorioRechazados/$1
+			mv "$directorioAceptados/$1" "$directorioRechazados/$1"
 	fi
 }
 
 ValidarSiYaFueProcesadoElArchivo()
 {
 	fecha=$(date +"%Y%m%d")
-	if [ ! -e $directorioProcesados/$fecha/$1 ]
+	if [ ! -e "$directorioProcesados/$fecha/$1" ]
 		then
 			ElArchivoEsValido=true
 		else

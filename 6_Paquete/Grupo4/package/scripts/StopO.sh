@@ -16,7 +16,7 @@ then
     exit
 fi
 
-logFile=$grupo/$exDIR_LOGS/StopO.log
+logFile="$grupo/$exDIR_LOGS/StopO.log"
 
 if [ -f $pidRecordFile ]
 then

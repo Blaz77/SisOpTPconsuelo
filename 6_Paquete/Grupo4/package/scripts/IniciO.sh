@@ -2,9 +2,9 @@
 
 source ./Logger.sh
 grupo=$HOME/Grupo4
-configFile="../dirconf/fnoc.conf"
+configFile="$grupo/dirconf/fnoc.conf"
 pidRecordFile="./pidRecord.dat"
-logFile="../dirconf/IniciO.log"
+logFile="$grupo/dirconf/IniciO.log"
 
 bin_Instalador=InstalO.sh
 bin_Inicializador=IniciO.sh
@@ -42,21 +42,21 @@ Leer_Config()
 	exDIR_PROCESS=$(grep '^Procesados.*' $configFile | cut -f2 -d'-')
 	exDIR_REPORTS=$(grep '^Reportes.*' $configFile | cut -f2 -d'-')
 	exDIR_LOGS=$(grep '^Logs.*' $configFile | cut -f2 -d'-')
-	
+
 	for i in "$exDIR_EXEC" "$exDIR_MASTER" "$exDIR_EXT" "$exDIR_ACCEPT" "$exDIR_REFUSE" "$exDIR_PROCESS" "$exDIR_REPORTS" "$exDIR_LOGS"
 	do
-		if [ $i == "" ]
+		if [ "$i" == "" ]
 		then
 			Error_Fatal "Archivo de configuracion daniado" "Leer_config"
 		fi
 	done
-	
+
 	exINIT_OK=1
 }
 
 Verificar_Directorio() # Params: string dirName
 {
-	if [ ! -d $grupo/$1 ] # Existe directorio
+	if [ ! -d "$grupo/$1" ] # Existe directorio
 	then
 		Error_Fatal "No se encuentra el directorio $1" "Verificar_Directorio"
 	fi
@@ -65,19 +65,19 @@ Verificar_Directorio() # Params: string dirName
 # Validar existencia de archivos y directorios segun archivo de configuracion
 Verificar_Directorios()
 {
-	Verificar_Directorio $exDIR_EXEC 
-	Verificar_Directorio $exDIR_MASTER
-	Verificar_Directorio $exDIR_EXT
-	Verificar_Directorio $exDIR_ACCEPT
-	Verificar_Directorio $exDIR_REFUSE
-	Verificar_Directorio $exDIR_PROCESS
-	Verificar_Directorio $exDIR_REPORTS
-	Verificar_Directorio $exDIR_LOGS
+	Verificar_Directorio "$exDIR_EXEC"
+	Verificar_Directorio "$exDIR_MASTER"
+	Verificar_Directorio "$exDIR_EXT"
+	Verificar_Directorio "$exDIR_ACCEPT"
+	Verificar_Directorio "$exDIR_REFUSE"
+	Verificar_Directorio "$exDIR_PROCESS"
+	Verificar_Directorio "$exDIR_REPORTS"
+	Verificar_Directorio "$exDIR_LOGS"
 }
 
 Verificar_Archivo() # Params: string dirName, string scriptName
 {
-	if [ ! -f $grupo/$1/$2 ] # Existe archivo
+	if [ ! -f "$grupo/$1/$2" ] # Existe archivo
 	then
 		Error_Fatal "No se encuentra el archivo $2" "Verificar_Archivo"
 	fi
@@ -87,25 +87,25 @@ Verificar_Archivos()
 {
 	for i in "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
 	do
-		Verificar_Archivo $exDIR_EXEC $i
+		Verificar_Archivo "$exDIR_EXEC" $i
 	done
-	
+
 	for i in $mae_Files
 	do
-		Verificar_Archivo $exDIR_MASTER $i
+		Verificar_Archivo "$exDIR_MASTER" $i
 	done
-	
+
 	for i in $table_Files
 	do
-		Verificar_Archivo $exDIR_MASTER $i
+		Verificar_Archivo "$exDIR_MASTER" $i
 	done
 }
 
 Verificar_Permiso_Lectura() # Params: string dirName, string fileName
 {
-	if [ ! -r $grupo/$1/$2 ]
+	if [ ! -r "$grupo/$1/$2" ]
 	then
-		chmod +r $grupo/$1/$2
+		chmod +r "$grupo/$1/$2"
 		Log_Info "Se agrega permiso de lectura para el archivo $2." "Verificar_Permiso_Lectura"
 	else
 		Log_Info "$2: Permiso de lectura OK." "Verificar_Permiso_Lectura"
@@ -114,9 +114,9 @@ Verificar_Permiso_Lectura() # Params: string dirName, string fileName
 
 Verificar_Permiso_Ejecucion() # Params: string dirName, string fileName
 {
-	if [ ! -x $grupo/$1/$2 ]
+	if [ ! -x "$grupo/$1/$2" ]
 	then
-		chmod +x $grupo/$1/$2
+		chmod +x "$grupo/$1/$2"
 		Log_Info "Se agrega permiso de ejecucion para el archivo $2." "Verificar_Permiso_Ejecucion"
 	else
 		Log_Info "$2: Permiso de ejecucion OK." "Verificar_Permiso_Ejecucion"
@@ -128,17 +128,17 @@ Verificar_Permisos()
 {
 	for i in "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
 	do
-		Verificar_Permiso_Ejecucion $exDIR_EXEC $i
+		Verificar_Permiso_Ejecucion "$exDIR_EXEC" $i
 	done
-	
+
 	for i in $mae_Files
 	do
-		Verificar_Permiso_Lectura $exDIR_MASTER $i
+		Verificar_Permiso_Lectura "$exDIR_MASTER" $i
 	done
-	
+
 	for i in $table_Files
 	do
-		Verificar_Permiso_Lectura $exDIR_MASTER $i
+		Verificar_Permiso_Lectura "$exDIR_MASTER" $i
 	done
 }
 
@@ -159,10 +159,10 @@ Setear_ambiente()
 # Verifica demonio corriendo, si es afirmativo, muestra y loguea el PID
 Verificar_Demonio()
 {
-	if [ -f $grupo/$exDIR_EXEC/$pidRecordFile ]
+	if [ -f "$grupo/$exDIR_EXEC/$pidRecordFile" ]
 	then
 		local PID=
-		read -r PID < $grupo/$exDIR_EXEC/$pidRecordFile
+		read -r PID < "$grupo/$exDIR_EXEC/$pidRecordFile"
 		local PID_PS=$(ps -fo pid,args -p $PID | grep ".*$PID.*Grupo4.*\.sh$" | sed -e 's/^[ \t]*//' | cut -f1 -d' ')
 		if [ "$PID" == "$PID_PS" -a "$PID_PS" != "" ]
 		then
@@ -175,7 +175,7 @@ Verificar_Demonio()
 # Iniciar el detector de novedades en background
 Iniciar_Demonio()
 {
-	$grupo/$exDIR_EXEC/$bin_Demonio &
+	"$grupo/$exDIR_EXEC/$bin_Demonio" &
 	demonio_PID=$!
 	echo "$demonio_PID" > "$pidRecordFile"
 	Log_Info "Se inicia el detector de novedades en el proceso: $demonio_PID. Para detener el detector ejecute el comando StopO.sh" "Iniciar_Demonio"
@@ -199,4 +199,3 @@ if [ "$tmp_Retorno" == "" ]
 then
 	Iniciar_Demonio
 fi
-
