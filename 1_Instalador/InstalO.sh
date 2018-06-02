@@ -309,7 +309,7 @@ Existen_Todos_Directorios()
 	while read -r linea
 	do
 		directorioElegido=$(echo $linea | cut -d '-' -f2)
-		if [ ! -e $grupo/$directorioElegido ]
+		if [ ! -e "$grupo/$directorioElegido" ]
 		then
 			existenTodosDirectorios=false
 		fi
@@ -322,9 +322,9 @@ Reparar()
 	while read -r linea
 	do
 		directorioElegido=$(echo $linea | cut -d '-' -f2)
-		if [ ! -e $grupo/$directorioElegido ]
+		if [ ! -e "$grupo/$directorioElegido" ]
 		then
-			mkdir $grupo/$directorioElegido
+			mkdir "$grupo/$directorioElegido"
 		fi
 	done < $archivofConf
 
