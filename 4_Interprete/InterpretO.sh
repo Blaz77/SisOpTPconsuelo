@@ -69,9 +69,11 @@ Procesar_Archivo()
 	cantidadCampos=$(grep -c "$pais-$sistema" $archivoT2)
 	logParaRegistroDeArchivo=""
 	let contadorDeRegistro=0
-	###No se por que el while no lee la ultima linea del archivo
-	while read -r linea
+	endRead=0
+	while [[ $endRead == 0 ]]
 	do
+		read -r linea
+		endRead=$?
 		let contadorDeRegistro=contadorDeRegistro+1
 		ResetearCampos
 		let contador=1
@@ -84,7 +86,6 @@ Procesar_Archivo()
 		InterpretarFecha
 		InterpretarMontos
 		GrabarArchivo
-
 	done < $directorioAceptados/$archivo
 }
 
