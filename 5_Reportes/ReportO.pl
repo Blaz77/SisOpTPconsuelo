@@ -29,33 +29,27 @@ sub Mostrar_Ayuda{
 sub Cargar_Metadatos
 {
 	# Hardcodeado, la vida misma
-	$Metadatos{"A"}{"6"}{"SEP_CAMP"} = ";";
-	$Metadatos{"A"}{"6"}{"SEP_DEC"} = ";";
-	$Metadatos{"A"}{"7"}{"SEP_CAMP"} = ";";
-	$Metadatos{"A"}{"7"}{"SEP_DEC"} = ";";
 }
 
-sub leerArchivos
+sub Obtener_PPImpagos
 {
+		($archivo_maestro) = "$ENV{HOME}/Grupo4/$ENV{exDIR_MASTER}/PPI.mae";
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
-	($archivo_prestamos) = "$ENV{HOME}/Grupo4/$ENV{exDIR_PROCESS}/PRESTAMOS.Argentina";
-	($archivo_maestro) = "$ENV{HOME}/Grupo4/$ENV{exDIR_MASTER}/PPI.mae";
-	print "Nombre de los archivos: $archivo_prestamos, $archivo_maestro \n";
 
-	open(PRESTAMOS, "<$archivo_prestamos") || die "ERROR: no se pudo abrir el archivo $archivo_prestamos";
+	print "Nombre de archivos: $archivo_maestro \n";
 	open(MAESTRO, "<$archivo_maestro") || die "ERROR: no se pudo abrir el archivo $archivo_maestro";
 
+	my %PPImpagos;
 	while ($linea = <MAESTRO>)
 	{
 		($PAIS_ID, $SIS_ID, $CTB_ANIO, $CTB_MES, $CTB_DIA, $CTB_ESTADO, $PRES_FE, $PRES_ID, $PRES_TI, $MT_PRES, $MT_IMPAGO, $MT_INDE, $MT_INNODE, $MT_DEB) = split(";", $linea);
 		
 		# A cada monto le reemplazo la , por . para poder hacer operaciones
-		my $SEP_DEC = $Metadatos{$PAIS_ID}{$SIS_ID}{SEP_DEC}
-		$MT_PRES =~ s/$SEP_DEC/./;
-		$MT_IMPAGO =~ s/$SEP_DEC/./;
-		$MT_INDE =~ s/$SEP_DEC/./;
-		$MT_INNODE =~ s/$SEP_DEC/./;
-		$MT_DEB =~ s/$SEP_DEC/./;
+		$MT_PRES =~ s/,/./;
+		$MT_IMPAGO =~ s/,/./;
+		$MT_INDE =~ s/,/./;
+		$MT_INNODE =~ s/,/./;
+		$MT_DEB =~ s/,/./;
 		
 		# PRES_ID es el codigo de prestamo
 		#%PPImpagos{$PRES_ID} = (MT_PRES => $MT_PRES, MT_IMPAGO => $MT_IMPAGO, MT_INDE => $MT_INDE, MT_INNODE => $MT_INNODE, MT_DEB => $MT_DEB)
@@ -66,13 +60,24 @@ sub leerArchivos
 		print "Debug: MT_REST_MAESTRO: $PPImpagos{$PRES_ID}{MT_PRES}\n";
 		
 	}
+		close(MAESTRO);
 
-	print "\n";
+	return %PPImpagos;
+}
 
-	while ($linea = <PRESTAMOS>)
+sub Obtener_PPais
+{
+	### Para que funcione hay que tener estos archivos en el directorio donde estoy
+
+		($archivo_prestamos) = "$ENV{HOME}/Grupo4/$ENV{exDIR_PROCESS}/PRESTAMOS.Argentina";
+	print "Nombre de archivos: $archivo_prestamos \n";
+	open(PRESTAMOS, "<$archivo_prestamos") || die "ERROR: no se pudo abrir el archivo $archivo_prestamos";
+
+	my %PPais;
+			while ($linea = <PRESTAMOS>)
 	{
 		($SIS_ID, $CTB_ANIO, $CTB_MES, $CTB_DIA, $CTB_ESTADO, $PRES_ID, $MT_PRES, $MT_IMPAGO, $MT_INDE, $MT_INNODE, $MT_DEB, $MT_REST, $PRES_CLI_ID, $PRES_CLI, $FECHA_GRAB, $USU_GRAB) = split(";", $linea);
-		$MT_REST =~ s/$SEP_DEC/./;
+		$MT_REST =~ s/,/./;
 		
 		%PPais{$PRES_ID} = (SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO);
 
@@ -81,7 +86,29 @@ sub leerArchivos
 	}
 	
 	close(PRESTAMOS);
-	close(MAESTRO);
+	return %PPais;
+}
+
+sub Mostrar_Listado
+{
+	# Muestra el listado a partir del hash previamente generado
+	# Si se llamo al script con opcion -g, ademas lo guarda en un archivo
+}
+
+sub Generar_Recomendacion
+{
+	# Devuelve los prestamos que pudieron compararse en un hash cuya clave es PRES_ID
+	# Tambien guarda RECAL o NORECAL para la recomendacion
+}
+
+sub Generar_Recomendacion
+{
+	local %PPImpagos = &Obtener_PPImpagos;
+	local %PPais = &Obtener_PPais;
+
+	%PComparados = &Comparar_Prestamos
+
+	&Mostrar_Listado
 }
 
 sub Gestionar_Parametros
@@ -115,5 +142,6 @@ system("clear");
 &Gestionar_Parametros;
 &Verificar_Ambiente;
 &Cargar_Metadatos;
+
 &Mostrar_Menu;
-&leerArchivos;
+&Generar_Recomendacion;
