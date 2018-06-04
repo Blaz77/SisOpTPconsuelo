@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
 use Getopt::Std;
+my %Metadatos;
 
 sub Mostrar_Ayuda{
 	print "\n",
@@ -24,6 +25,16 @@ sub Mostrar_Ayuda{
 		"\n";
 }
 
+
+sub Cargar_Metadatos
+{
+	# Hardcodeado, la vida misma
+	$Metadatos{"A"}{"6"}{"SEP_CAMP"} = ";";
+	$Metadatos{"A"}{"6"}{"SEP_DEC"} = ";";
+	$Metadatos{"A"}{"7"}{"SEP_CAMP"} = ";";
+	$Metadatos{"A"}{"7"}{"SEP_DEC"} = ";";
+}
+
 sub leerArchivos
 {
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
@@ -36,32 +47,37 @@ sub leerArchivos
 
 	while ($linea = <MAESTRO>)
 	{
-		@arreglo = split(";", $linea);
-		### A cada monto le reemplazo la , por . para poder hacer operaciones
-		$arreglo[9] =~ s/,/./;
-		$arreglo[10] =~ s/,/./;
-		$arreglo[11] =~ s/,/./;
-		$arreglo[12] =~ s/,/./;
-		$arreglo[13] =~ s/,/./;
+		($PAIS_ID, $SIS_ID, $CTB_ANIO, $CTB_MES, $CTB_DIA, $CTB_ESTADO, $PRES_FE, $PRES_ID, $PRES_TI, $MT_PRES, $MT_IMPAGO, $MT_INDE, $MT_INNODE, $MT_DEB) = split(";", $linea);
 		
-		$hash{"MT_PRES"} = $arreglo[9];
-		$hash{"MT_IMPAGO"} = $arreglo[10];
-		$hash{"MT_INDE"} = $arreglo[11];
-		$hash{"MT_INNODE"} = $arreglo[12];
-		$hash{"MT_DEB"} = $arreglo[13];
+		# A cada monto le reemplazo la , por . para poder hacer operaciones
+		my $SEP_DEC = $Metadatos{$PAIS_ID}{$SIS_ID}{SEP_DEC}
+		$MT_PRES =~ s/$SEP_DEC/./;
+		$MT_IMPAGO =~ s/$SEP_DEC/./;
+		$MT_INDE =~ s/$SEP_DEC/./;
+		$MT_INNODE =~ s/$SEP_DEC/./;
+		$MT_DEB =~ s/$SEP_DEC/./;
+		
+		# PRES_ID es el codigo de prestamo
+		#%PPImpagos{$PRES_ID} = (MT_PRES => $MT_PRES, MT_IMPAGO => $MT_IMPAGO, MT_INDE => $MT_INDE, MT_INNODE => $MT_INNODE, MT_DEB => $MT_DEB)
+		%PPImpagos{$PRES_ID} = (PAIS_ID => $PAIS_ID, SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO);
+		$PPImpagos{$PRES_ID}{MT_PRES} = $MT_PRES + $MT_IMPAGO + $MT_INDE + $MT_INNODE - $MT_DEB;
 	
-		$MT_REST_MAESTRO = $hash{"MT_PRES"} + $hash{"MT_IMPAGO"} + $hash{"MT_INDE"} + $hash{"MT_INNODE"} - $hash{"MT_DEB"};
-		print "MT_REST_MAESTRO: $MT_REST_MAESTRO\n";
+		# [DEBUG]
+		print "Debug: MT_REST_MAESTRO: $PPImpagos{$PRES_ID}{MT_PRES}\n";
+		
 	}
 
 	print "\n";
 
 	while ($linea = <PRESTAMOS>)
 	{
-		@arreglo = split(";", $linea);	
-		$arreglo[11] =~ s/,/./;
-		$MT_REST_PRESTAMOS = $arreglo[11];
-		print "MT_REST_PRESTAMOS: $MT_REST_PRESTAMOS\n";
+		($SIS_ID, $CTB_ANIO, $CTB_MES, $CTB_DIA, $CTB_ESTADO, $PRES_ID, $MT_PRES, $MT_IMPAGO, $MT_INDE, $MT_INNODE, $MT_DEB, $MT_REST, $PRES_CLI_ID, $PRES_CLI, $FECHA_GRAB, $USU_GRAB) = split(";", $linea);
+		$MT_REST =~ s/$SEP_DEC/./;
+		
+		%PPais{$PRES_ID} = (SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO);
+
+		# [DEBUG]
+		print "Debug: MT_REST: $MT_REST\n";
 	}
 	
 	close(PRESTAMOS);
@@ -91,11 +107,13 @@ sub Mostrar_Menu
 	print "(1) - Recomendacion.\n";
 	print "(2) - Listar Divergencias en porcentaje.\n";
 	print "(3) - Listar Divergencias en monto.\n";
+	
 }
 
 system("clear");
 
 &Gestionar_Parametros;
 &Verificar_Ambiente;
+&Cargar_Metadatos;
 &Mostrar_Menu;
 &leerArchivos;
