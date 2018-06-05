@@ -1,7 +1,16 @@
 #!/usr/bin/perl
 
 use Getopt::Std;
-my %Metadatos;
+my %PAISES;
+my %SISTEMAS;
+my $DIR_REPORTES;
+my $DIR_LOGS;
+my $DIR_PROC;
+my $DIR_MAE;
+my $GRUPO = "$ENV{HOME}/Grupo4";
+
+my $PARAM_PAIS_ID;
+my $PARAM_SIS_ID;
 
 sub Mostrar_Ayuda{
 	print "\n",
@@ -28,12 +37,37 @@ sub Mostrar_Ayuda{
 
 sub Cargar_Metadatos
 {
-	# Hardcodeado, la vida misma
+	$DIR_REPORTES = $ENV{exDIR_REPORTS};
+	$DIR_LOGS = $ENV{exDIR_LOGS};
+	$DIR_PROC = $ENV{exDIR_PROCESS};
+	$DIR_MAE = $ENV{exDIR_MASTER};
+	
+	($archivo_pais_sistema) = "$DIR_MAE/p-s.mae";
+
+	open(PYS, "<$archivo_pais_sistema") || die "ERROR: no se pudo abrir el archivo $archivo_pais_sistema";
+	while ($linea = <PYS>)
+	{
+		($PAIS_ID, $PAIS_DESC, $SIS_ID, $SIS_DESC) = split("-", $linea);
+		
+		if (! exists ($PAISES{$PAIS_ID})) {
+			$PAISES{$PAIS_ID} = $PAIS_DESC;
+		}
+		
+		if (! exists ($SISTEMAS{$SIS_ID})) {
+			$SISTEMAS{$SIS_ID} = $SIS_DESC;
+		}
+		
+	}
+	close(MAESTRO);
+	
+	# [DEBUG]
+	print "Debug: PAISES: %PAISES\n";
+	print "Debug: SISTEMAS: %SISTEMAS\n";
 }
 
 sub Obtener_PPImpagos
 {
-		($archivo_maestro) = "$ENV{HOME}/Grupo4/$ENV{exDIR_MASTER}/PPI.mae";
+	($archivo_maestro) = "$DIR_MAE/PPI.mae";
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
 
 	print "Nombre de archivos: $archivo_maestro \n";
@@ -68,8 +102,8 @@ sub Obtener_PPImpagos
 sub Obtener_PPais
 {
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
-
-		($archivo_prestamos) = "$ENV{HOME}/Grupo4/$ENV{exDIR_PROCESS}/PRESTAMOS.Argentina";
+	($archivo_prestamos) = "$DIR_PROC/PRESTAMOS.Argentina";
+	
 	print "Nombre de archivos: $archivo_prestamos \n";
 	open(PRESTAMOS, "<$archivo_prestamos") || die "ERROR: no se pudo abrir el archivo $archivo_prestamos";
 
@@ -135,6 +169,7 @@ sub Mostrar_Menu
 	print "(2) - Listar Divergencias en porcentaje.\n";
 	print "(3) - Listar Divergencias en monto.\n";
 	
+	$PARAM_PAIS_ID = "A";
 }
 
 system("clear");
