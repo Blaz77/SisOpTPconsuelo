@@ -213,34 +213,34 @@ Mover_Archivos()
     rutaScripts="$grupo/$dirEjecutables/"
 
 	archivoAMover="$paqueteOrigen/archivostp/T1.tab"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/archivostp/T2.tab"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/archivostp/p-s.mae"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/archivostp/PPI.mae"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/scripts/Logger.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/IniciO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/DetectO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/StopO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/InterpretO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/ReportO.pl"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	LogearMensaje ${FUNCNAME[0]} "INF" "Se movieron los archivos del paquete de origen a las rutas establecidas por el usuario." $archivoLogInstalacion
 }
