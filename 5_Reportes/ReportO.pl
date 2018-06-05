@@ -20,7 +20,7 @@ sub Mostrar_Ayuda{
 		"Condiciones de ejecucion:\n",
 		"  El sistema debe estar inicializado\n",
 		"\n",
-		"Parametros:\n",
+		"Argumentos:\n",
 		"  <pais>	(OBLIGATORIO)\n",
 		"		Codigo de pais.\n",
 		"  <sistema> \n",
@@ -119,9 +119,9 @@ sub Obtener_PPais
 		
 		# Tomo solamente el que voy a usar para la recomendacion (Mayor dia, mayor fecha de grabacion)
 		if (! exists (%PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES}) or $PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{CTB_DIA} < $CTB_DIA || $PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{FECHA_GRAB} < $FECHA_GRAB) {
-
-		%PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES} = (SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO, FECHA_GRAB => $FECHA_GRAB);
-
+			%PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES} = (SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO, MT_REST => $MT_REST, FECHA_GRAB => $FECHA_GRAB);
+		}
+		
 		# [DEBUG]
 		print "Debug: MT_REST: $MT_REST\n";
 	}
@@ -136,14 +136,42 @@ sub Mostrar_Listado
 	# Si se llamo al script con opcion -g, ademas lo guarda en un archivo
 }
 
+# Devuelve los prestamos que pudieron compararse en arreglo de prestamos
+# Tambien guarda RECAL o NORECAL para la recomendacion
 sub Comparar_Prestamos
 {
-	my %PComparados;
+	my @PComparados;
 	foreach $PRES_ID (keys(%PPImpagos)) {
-		
+		if (! exists (%PPais{$PRES_ID})) {
+			next;
+		}
+		foreach $CTB_ANIO (keys(%PPImpagos{$PRES_ID})) {
+			if (! exists (%PPais{$PRES_ID}{$CTB_ANIO})) {
+				next;
+			}
+			foreach $CTB_MES (keys(%PPImpagos{$PRES_ID}{$CTB_ANIO}) {
+				if (! exists (%PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES})) {
+					next;
+				}
+				%DatosMaestro = %PPImpagos{$PRES_ID}{$CTB_ANIO}{$CTB_MES};
+				%DatosPrestamo = %PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES};
+				
+				if ($DatosMaestro{CTB_ESTADO} == "SMOR" and $DatosPrestamo{CTB_ESTADO} != "SMOR") {
+					$RECO = "RECAL";
+				}
+				elsif ($DatosMaestro{MT_REST} < $DatosPrestamo{MT_REST}) {
+					$RECO = "RECAL";
+				}
+				else {
+					$RECO = "NORECAL";
+				}
+				
+				$DIF = $DatosMaestro{MT_REST} - $DatosPrestamo{MT_REST};
+				%DatosComparado = (PAIS => $PARAM_PAIS_ID, SISID => $DatosMaestro{SIS_ID}, PRESID => $PRES_ID, RECO => $RECO, M.ESTADO => $DatosMaestro{CTB_ESTADO}, P.ESTADO => $DatosPrestamo{CTB_ESTADO}, M.REST => $DatosMaestro{MT_REST}, P.REST => $DatosPrestamo{MT_REST}, DIF => $DIF, ANIO => $CTB_ANIO, MES => $CTB_MES, M.DIA => $DatosMaestro{CTB_DIA}, P.DIA => $DatosPrestamo{CTB_DIA});
+				push(@PComparados %DatosComparado);
+			}
+		}
 	}
-	# Devuelve los prestamos que pudieron compararse en un hash cuya clave es PRES_ID
-	# Tambien guarda RECAL o NORECAL para la recomendacion
 }
 
 sub Reportar_Recomendacion
