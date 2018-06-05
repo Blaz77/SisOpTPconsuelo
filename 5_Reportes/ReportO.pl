@@ -87,14 +87,17 @@ sub Obtener_PPImpagos
 		
 		# PRES_ID es el codigo de prestamo
 		#%PPImpagos{$PRES_ID} = (MT_PRES => $MT_PRES, MT_IMPAGO => $MT_IMPAGO, MT_INDE => $MT_INDE, MT_INNODE => $MT_INNODE, MT_DEB => $MT_DEB)
-		%PPImpagos{$PRES_ID} = (PAIS_ID => $PAIS_ID, SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO);
-		$PPImpagos{$PRES_ID}{MT_PRES} = $MT_PRES + $MT_IMPAGO + $MT_INDE + $MT_INNODE - $MT_DEB;
-	
+		
+		# Tomo solamente el que voy a usar para la recomendacion (Mayor dia )
+		if (! exists (%PPImpagos{$PRES_ID}{$CTB_ANIO}{$CTB_MES}) or $PPImpagos{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{CTB_DIA} < $CTB_DIA) {
+			%PPImpagos{$PRES_ID}{$CTB_ANIO}{$CTB_MES} = (PAIS_ID => $PAIS_ID, SIS_ID => $SIS_ID, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO);
+			$PPImpagos{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{MT_PRES} = $MT_PRES + $MT_IMPAGO + $MT_INDE + $MT_INNODE - $MT_DEB;
+		}
 		# [DEBUG]
-		print "Debug: MT_REST_MAESTRO: $PPImpagos{$PRES_ID}{MT_PRES}\n";
+		print "Debug: MT_REST_MAESTRO: $PPImpagos{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{MT_PRES}\n";
 		
 	}
-		close(MAESTRO);
+	close(MAESTRO);
 
 	return %PPImpagos;
 }
@@ -102,18 +105,22 @@ sub Obtener_PPImpagos
 sub Obtener_PPais
 {
 	### Para que funcione hay que tener estos archivos en el directorio donde estoy
-	($archivo_prestamos) = "$DIR_PROC/PRESTAMOS.Argentina";
+	($archivo_prestamos) = "$DIR_PROC/PRESTAMOS." . "$PAISES{$PARAM_PAIS_ID}";
 	
 	print "Nombre de archivos: $archivo_prestamos \n";
 	open(PRESTAMOS, "<$archivo_prestamos") || die "ERROR: no se pudo abrir el archivo $archivo_prestamos";
 
 	my %PPais;
-			while ($linea = <PRESTAMOS>)
+	while ($linea = <PRESTAMOS>)
 	{
 		($SIS_ID, $CTB_ANIO, $CTB_MES, $CTB_DIA, $CTB_ESTADO, $PRES_ID, $MT_PRES, $MT_IMPAGO, $MT_INDE, $MT_INNODE, $MT_DEB, $MT_REST, $PRES_CLI_ID, $PRES_CLI, $FECHA_GRAB, $USU_GRAB) = split(";", $linea);
 		$MT_REST =~ s/,/./;
+		$FECHA_GRAB =~ s?(\d{2})/(\d{2})/(\d{4})?$3$2$1?;
 		
-		%PPais{$PRES_ID} = (SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO);
+		# Tomo solamente el que voy a usar para la recomendacion (Mayor dia, mayor fecha de grabacion)
+		if (! exists (%PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES}) or $PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{CTB_DIA} < $CTB_DIA || $PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES}{FECHA_GRAB} < $FECHA_GRAB) {
+
+		%PPais{$PRES_ID}{$CTB_ANIO}{$CTB_MES} = (SIS_ID => $SIS_ID, CTB_ANIO => $CTB_ANIO, CTB_MES => $CTB_MES, CTB_DIA => $CTB_DIA, CTB_ESTADO => $CTB_ESTADO, FECHA_GRAB => $FECHA_GRAB);
 
 		# [DEBUG]
 		print "Debug: MT_REST: $MT_REST\n";
@@ -129,13 +136,17 @@ sub Mostrar_Listado
 	# Si se llamo al script con opcion -g, ademas lo guarda en un archivo
 }
 
-sub Generar_Recomendacion
+sub Comparar_Prestamos
 {
+	my %PComparados;
+	foreach $PRES_ID (keys(%PPImpagos)) {
+		
+	}
 	# Devuelve los prestamos que pudieron compararse en un hash cuya clave es PRES_ID
 	# Tambien guarda RECAL o NORECAL para la recomendacion
 }
 
-sub Generar_Recomendacion
+sub Reportar_Recomendacion
 {
 	local %PPImpagos = &Obtener_PPImpagos;
 	local %PPais = &Obtener_PPais;
@@ -179,4 +190,4 @@ system("clear");
 &Cargar_Metadatos;
 
 &Mostrar_Menu;
-&Generar_Recomendacion;
+&Reportar_Recomendacion;
