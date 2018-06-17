@@ -1,14 +1,25 @@
-#!/usr/bin/perl
+#!/bin/perl
 use feature qw(switch);
 no warnings 'experimental';
 
 use Getopt::Std;
-my %PAISES;
+
+#REPLACE por path de los maestros
+$DIR_MAE = "ENV{PATH}";
+
+$NAME_FILE_MAESTRO = "PPI.mae";
+
+#$PATH_MAESTRO = "$DIR_MAE\$NAME_FILE_MAESTRO";
+
+$PATH_MAESTRO = $NAME_FILE_MAESTRO;
+
+# HASH 
+%PAIS_PRESTAMO;
+
 my %SISTEMAS;
 my $DIR_REPORTES;
 my $DIR_LOGS;
 my $DIR_PROC;
-my $DIR_MAE;
 my $GRUPO = "$ENV{HOME}/Grupo4";
 
 my $PARAM_PAIS_ID;
@@ -19,27 +30,56 @@ my $DebeGuardarSalida;
 sub Gestionar_Parametros
 {
 	$num_args = $#ARGV + 1;
-  given($num_args){
-    when(0) { print "Debe ingresar al menos un argumento\n"; }
-    when(1) {
-      given($ARGV[0]){
-        when("-a") { Mostrar_Ayuda(); }
-        when("-g") { print "Debe ingresar un filtro para poder grabar la salida \n"; }
-        default { RealizarRecomendacion1($ARGV[0]);  }
-        }
-      }
-    when(2) {  RealizarRecomendacion2($ARGV[0],$ARGV[1]);}
-    when(3) {  RealizarRecomendacion3($ARGV[0],$ARGV[1],$ARGV[2]);}
-    when(4) {  RealizarRecomendacion4($ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]);  }
-    default { print "El ingreso maximo de parametros es 4.\n";  }
-  }
+  	
+  	given($num_args)
+  	{
+    	when(0) { print "Debe ingresar al menos un argumento \n"; }
+    	when(1) 
+    	{
+      		given($ARGV[0])
+      		{
+        		when("-a") { Mostrar_Ayuda(); }
+        		when("-g") { print "Debe ingresar un filtro para poder grabar la salida \n"; }
+        		default { Recomendacion_Cod_Pais($ARGV[0]);  }
+        	}
+      	}
+    	when(2) {  RealizarRecomendacion2($ARGV[0],$ARGV[1]);}
+    	when(3) {  RealizarRecomendacion3($ARGV[0],$ARGV[1],$ARGV[2]);}
+    	when(4) {  RealizarRecomendacion4($ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]);  }
+    	default { print "El ingreso maximo de parametros es 4. \n";  }
+	}
 }
 
-sub RealizarRecomendacion1
+sub Recomendacion_Cod_Pais
 {
-	print " Filtrao de PPI.mae \n";
-	print " RealizarRecomendacion 1 parametro \n";
-	FiltrarMaestros1($param1);
+	print "Filtro PPI.mae por codigo de pais y cargo el hash \n";
+	print "Realizar recomendacion por codigo de pais \n";
+	
+	print "$PATH_MAESTRO \n";
+
+	open (Handler_maestro,"<$PATH_MAESTRO") || die "ERROR: No puedo abrir el fichero $PATH_MAESTRO \n";
+
+	while ($linea=<Handler_maestro>)
+	{
+		#DEBUG
+		print $linea . "\n";
+
+		($IdPais, $IdSistema, $Year, $Month, $Day, $Estado, $Date, $IdPrestamo, $TipoPrestamo, $MontoPrestamo, $MontoImpago, $MID, $MIND, $MontoDebitado) = 
+		split(";", $linea);
+
+		$MontoPrestamo =~ s/,/./;
+		$MontoImpago =~ s/,/./;
+		$MID =~ s/,/./;
+		$MIND =~ s/,/./;
+		$MontoDebitado =~ s/,/./;
+
+		#DEBUG
+		print "$IdPais,$IdSistema,$Year,$Month,$Day,$Estado,$Date,$IdPrestamo,$TipoPrestamo,$MontoPrestamo,$MontoImpago,$MID,$MIND,$MontoDebitado";
+
+		$PAIS_PRESTAMO{"$IdPrestamo"} = ($IdPais, $IdSistema, $Year, $Month, $Day, $Estado, $Date, $IdPrestamo, $TipoPrestamo, $MontoPrestamo, $MontoImpago, $MID, $MIND, $MontoDebitado);
+	}
+
+	close (Handler_maestro);
 }
 
 sub RealizarRecomendacion2
@@ -159,6 +199,12 @@ sub Verificar_Ambiente
 {
 	my $ambienteOK = $ENV{exINIT_OK};
 	die "El ambiente no esta inicializado. No se puede continuar. \n" if $ambienteOK != 1;
+}
+
+sub Cargo_Archivo_Maestro
+{
+	# Abro el archivo para su lextura
+
 }
 
 #La lineas siguiente deberia realizarse si tenemos el sistema levantado
