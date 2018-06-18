@@ -15,6 +15,8 @@ $PATH_MAESTRO = $NAME_FILE_MAESTRO;
 #HASH 
 %CONTABLE_PPI;
 
+%MONTO_RESTANTE_PPI; #Este hash tiene como clave: codigo de prestamo, y valor: monto restante calculado
+
 my %SISTEMAS;
 my $DIR_REPORTES;
 my $DIR_LOGS;
@@ -49,6 +51,41 @@ sub Gestionar_Parametros
     	when(4) { RealizarRecomendacion4($ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]); }
     	default { print "El ingreso maximo de parametros es 4. \n";  }
 	}
+}
+
+sub CalcularMontoRestante
+{
+	foreach $pres_id (keys(%CONTABLE_PPI))
+	{
+		@campos = split(";", $CONTABLE_PPI{"$pres_id"});
+		$anio_contable = $campos[2];
+		$mes_contable = $campos[3];
+		$monto_prestamo = $campos[9];
+		$monto_impago = $campos[10];
+		$monto_devengado = $campos[11];
+		$monto_no_devengado = $campos[12];
+		$monto_debitado = $campos[13];
+
+		$monto_restante = $monto_prestamo + $monto_impago + $monto_devengado + $monto_no_devengado - $monto_debitado;
+		$MONTO_RESTANTE_PPI{"$pres_id"} = $monto_restante;
+		#print "Montos: $monto_prestamo + $monto_impago + $monto_devengado + $monto_no_devengado - $monto_debitado";
+		#print "Restante: $monto_restante\n";
+	
+		open(PRESTAMOS, "<PRESTAMOS.Argentina") || die "ERROR: no se pudo abrir el archivo PRESTAMOS.Argentina";
+		while ($linea = <PRESTAMOS>)
+		{
+			@campos_prestamos = split(";", $linea);
+			$anio_contable_prestamos = $campos_prestamos[1];
+			$mes_contable_prestamos = $campos_prestamos[2];
+			$pres_id_prestamos = $campos_prestamos[5];
+			$monto_restante_prestamos = $campos_prestamos[11];
+			$monto_restante_prestamos =~ s/,/./;
+			#print "Monto restante préstamos: $monto_restante_prestamos\n";
+			#print "$anio_contable_prestamos, $mes_contable_prestamos, $pres_id_prestamos, $monto_restante_prestamos\n";
+		}
+		close(PRESTAMOS);
+	}
+
 }
 
 sub Recomendacion_Cod_Pais
@@ -87,6 +124,8 @@ sub Recomendacion_Cod_Pais
 	}
 
 	close (Handler_maestro);
+
+	&CalcularMontoRestante;
 }
 
 sub RealizarRecomendacion2
