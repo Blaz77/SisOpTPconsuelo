@@ -82,7 +82,7 @@ sub Recomendacion_Cod_Pais
 			#DEBUG
 			print "$IdPais,$IdSistema,$Year,$Month,$Day,$Estado,$Date,$IdPrestamo,$TipoPrestamo,$MontoPrestamo,$MontoImpago,$MID,$MIND,$MontoDebitado";
 
-			$CONTABLE_PPI{"$IdPrestamo"} = ($IdPais, $IdSistema, $Year, $Month, $Day, $Estado, $Date, $IdPrestamo, $TipoPrestamo, $MontoPrestamo, $MontoImpago, $MID, $MIND, $MontoDebitado);
+			$CONTABLE_PPI{"$IdPrestamo"} = "$IdPais;$IdSistema;$Year;$Month;$Day;$Estado;$Date;$IdPrestamo;$TipoPrestamo;$MontoPrestamo;$MontoImpago;$MID;$MIND;$MontoDebitado";
 		}
 	}
 
