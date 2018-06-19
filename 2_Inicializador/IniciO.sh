@@ -22,7 +22,6 @@ Error_Fatal()
 	error="Imposible inicializar el sistema: $1"
 	LogearMensaje "$2" "ERR" "$error" "$logFile"
 	echo "$error"
-	exit
 }
 
 # Params: string mensajeEspecifico, string funcionOrigen
@@ -48,10 +47,11 @@ Leer_Config()
 		if [ "$i" == "" ]
 		then
 			Error_Fatal "Archivo de configuracion daniado" "Leer_config"
+			return 1
 		fi
 	done
 
-	exINIT_OK=1
+	return 0
 }
 
 Verificar_Directorio() # Params: string dirName
@@ -59,20 +59,32 @@ Verificar_Directorio() # Params: string dirName
 	if [ ! -d "$grupo/$1" ] # Existe directorio
 	then
 		Error_Fatal "No se encuentra el directorio $1" "Verificar_Directorio"
+		return 1
 	fi
+	return 0
 }
 
 # Validar existencia de archivos y directorios segun archivo de configuracion
 Verificar_Directorios()
 {
 	Verificar_Directorio "$exDIR_EXEC"
+	local errors=$?
 	Verificar_Directorio "$exDIR_MASTER"
+	errors=$(expr $errors + $?)
 	Verificar_Directorio "$exDIR_EXT"
+	errors=$(expr $errors + $?)
 	Verificar_Directorio "$exDIR_ACCEPT"
+	errors=$(expr $errors + $?)
 	Verificar_Directorio "$exDIR_REFUSE"
+	errors=$(expr $errors + $?)
 	Verificar_Directorio "$exDIR_PROCESS"
+	errors=$(expr $errors + $?)
 	Verificar_Directorio "$exDIR_REPORTS"
+	errors=$(expr $errors + $?)
 	Verificar_Directorio "$exDIR_LOGS"
+	errors=$(expr $errors + $?)
+	
+	return $errors
 }
 
 Verificar_Archivo() # Params: string dirName, string scriptName
@@ -80,25 +92,32 @@ Verificar_Archivo() # Params: string dirName, string scriptName
 	if [ ! -f "$grupo/$1/$2" ] # Existe archivo
 	then
 		Error_Fatal "No se encuentra el archivo $2" "Verificar_Archivo"
+		return 1
 	fi
+	return 0
 }
 
 Verificar_Archivos()
 {
+	local errors=0
 	for i in "$bin_Demonio" "$bin_Killer" "$bin_Interprete" "$bin_Reportes"
 	do
 		Verificar_Archivo "$exDIR_EXEC" $i
+		errors=$(expr $errors + $?)
 	done
 
 	for i in $mae_Files
 	do
 		Verificar_Archivo "$exDIR_MASTER" $i
+		errors=$(expr $errors + $?)
 	done
 
 	for i in $table_Files
 	do
 		Verificar_Archivo "$exDIR_MASTER" $i
+		errors=$(expr $errors + $?)
 	done
+	return $errors
 }
 
 Verificar_Permiso_Lectura() # Params: string dirName, string fileName
@@ -145,6 +164,7 @@ Verificar_Permisos()
 # Prepara las variables de ambiente para ser utilizadas por el resto de los scripts
 Setear_ambiente()
 {
+	exINIT_OK=1
 	export exDIR_EXEC
 	export exDIR_MASTER
 	export exDIR_EXT
@@ -181,21 +201,28 @@ Iniciar_Demonio()
 	Log_Info "Se inicia el detector de novedades en el proceso: $demonio_PID. Para detener el detector ejecute el comando StopO.sh" "Iniciar_Demonio"
 }
 
+Main()
+{
+	if [ "$exINIT_OK" == 1 ]
+	then
+		echo "El ambiente ya fue inicializado anteriormente."
+	else
+		Leer_Config
+		if [ $? -gt 0 ]; then return 1; fi
+		Verificar_Directorios
+		if [ $? -gt 0 ]; then return 1; fi
+		Verificar_Archivos
+		if [ $? -gt 0 ]; then return 1; fi
+		Verificar_Permisos
+		Setear_ambiente
+	fi
 
-if [ "$exINIT_OK" == 1 ]
-then
-    echo "El ambiente ya fue inicializado anteriormente."
-else
-    Leer_Config
-    Verificar_Directorios
-    Verificar_Archivos
-    Verificar_Permisos
-    Setear_ambiente
-fi
+	tmp_Retorno=
+	Verificar_Demonio
+	if [ "$tmp_Retorno" == "" ]
+	then
+		Iniciar_Demonio
+	fi
+}
 
-tmp_Retorno=
-Verificar_Demonio
-if [ "$tmp_Retorno" == "" ]
-then
-	Iniciar_Demonio
-fi
+Main

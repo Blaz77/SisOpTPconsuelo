@@ -69,11 +69,8 @@ Procesar_Archivo()
 	cantidadCampos=$(grep -c "$pais-$sistema" $archivoT2)
 	logParaRegistroDeArchivo=""
 	let contadorDeRegistro=0
-	endRead=0
-	while [[ $endRead == 0 ]]
+	while read -r linea || [ -n "$linea" ]
 	do
-		read -r linea
-		endRead=$?
 		let contadorDeRegistro=contadorDeRegistro+1
 		ResetearCampos
 		let contador=1
@@ -201,7 +198,7 @@ InterpretarMontos()
 	MT_INNODE=$(echo $MT_INNODE | sed s/"^$"/"0"/)
 	MT_DEB=$(echo $MT_DEB | sed s/"^$"/"0"/)
 
-	MT_REST=$(echo "$MT_PRES+$MT_IMPAGO+$MT_INDE+$MT_INNODE-$MT_DEB" | bc -l)
+	MT_REST=$(echo "$MT_PRES+$MT_IMPAGO+$MT_INDE+$MT_INNODE-$MT_DEB" | bc -l | sed "s/^\./0./")
 
 	#echo "mt pres: $MT_PRES"
 	#echo "mt impago: $MT_IMPAGO"
