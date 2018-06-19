@@ -313,6 +313,21 @@ Existen_Todos_Directorios()
 		then
 			existenTodosDirectorios=false
 		fi
+		
+		campo=$(echo $linea | cut -d '-' -f1)
+		if [ "$campo" == "Ejecutables" ]
+		then
+			if [ ! -e "$grupo/$directorioElegido/IniciO.sh" -o ! -e "$grupo/$directorioElegido/DetectO.sh" -o ! -e "$grupo/$directorioElegido/InterpretO.sh" -o ! -e "$grupo/$directorioElegido/Logger.sh" -o ! -e "$grupo/$directorioElegido/StopO.sh" -o ! -e "$grupo/$directorioElegido/ReportO.pl" ]
+			then
+				existenTodosDirectorios=false
+			fi
+		elif [ "$campo" == "Maestros" ]
+		then
+			if [ ! -e "$grupo/$directorioElegido/T1.tab" -o ! -e "$grupo/$directorioElegido/T2.tab" -o ! -e "$grupo/$directorioElegido/p-s.mae" -o ! -e "$grupo/$directorioElegido/PPI.mae" ]
+			then
+				existenTodosDirectorios=false
+			fi
+		fi
 	done < $archivofConf
 }
 
@@ -326,7 +341,18 @@ Reparar()
 		then
 			mkdir "$grupo/$directorioElegido"
 		fi
+		
+		campo=$(echo $linea | cut -d '-' -f1)
+		if [ "$campo" == "Ejecutables" ]
+		then
+			dirEjecutables="$directorioElegido"
+		elif [ "$campo" == "Maestros" ]
+		then
+			dirMaestros="$directorioElegido"
+		fi
 	done < $archivofConf
+	
+	Mover_Archivos
 
 	LogearMensaje ${FUNCNAME[0]} "INF" "Instalación reparada exitosamente." $archivoLogInstalacion
 	echo "Instalación reparada exitosamente."
