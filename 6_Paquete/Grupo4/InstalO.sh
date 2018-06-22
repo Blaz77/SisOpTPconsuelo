@@ -213,34 +213,34 @@ Mover_Archivos()
     rutaScripts="$grupo/$dirEjecutables/"
 
 	archivoAMover="$paqueteOrigen/archivostp/T1.tab"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/archivostp/T2.tab"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/archivostp/p-s.mae"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/archivostp/PPI.mae"
-	cp $archivoAMover $rutaMaestros
+	cp $archivoAMover "$rutaMaestros"
 
 	archivoAMover="$paqueteOrigen/scripts/Logger.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/IniciO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/DetectO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/StopO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/InterpretO.sh"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	archivoAMover="$paqueteOrigen/scripts/ReportO.pl"
-	cp $archivoAMover $rutaScripts
+	cp $archivoAMover "$rutaScripts"
 
 	LogearMensaje ${FUNCNAME[0]} "INF" "Se movieron los archivos del paquete de origen a las rutas establecidas por el usuario." $archivoLogInstalacion
 }
@@ -313,6 +313,21 @@ Existen_Todos_Directorios()
 		then
 			existenTodosDirectorios=false
 		fi
+		
+		campo=$(echo $linea | cut -d '-' -f1)
+		if [ "$campo" == "Ejecutables" ]
+		then
+			if [ ! -e "$grupo/$directorioElegido/IniciO.sh" -o ! -e "$grupo/$directorioElegido/DetectO.sh" -o ! -e "$grupo/$directorioElegido/InterpretO.sh" -o ! -e "$grupo/$directorioElegido/Logger.sh" -o ! -e "$grupo/$directorioElegido/StopO.sh" -o ! -e "$grupo/$directorioElegido/ReportO.pl" ]
+			then
+				existenTodosDirectorios=false
+			fi
+		elif [ "$campo" == "Maestros" ]
+		then
+			if [ ! -e "$grupo/$directorioElegido/T1.tab" -o ! -e "$grupo/$directorioElegido/T2.tab" -o ! -e "$grupo/$directorioElegido/p-s.mae" -o ! -e "$grupo/$directorioElegido/PPI.mae" ]
+			then
+				existenTodosDirectorios=false
+			fi
+		fi
 	done < $archivofConf
 }
 
@@ -326,7 +341,18 @@ Reparar()
 		then
 			mkdir "$grupo/$directorioElegido"
 		fi
+		
+		campo=$(echo $linea | cut -d '-' -f1)
+		if [ "$campo" == "Ejecutables" ]
+		then
+			dirEjecutables="$directorioElegido"
+		elif [ "$campo" == "Maestros" ]
+		then
+			dirMaestros="$directorioElegido"
+		fi
 	done < $archivofConf
+	
+	Mover_Archivos
 
 	LogearMensaje ${FUNCNAME[0]} "INF" "Instalación reparada exitosamente." $archivoLogInstalacion
 	echo "Instalación reparada exitosamente."
